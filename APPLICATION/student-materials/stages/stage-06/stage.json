@@ -1,0 +1,55 @@
+{
+  "id": "stage-06",
+  "order": 6,
+  "title": "Mongoose models, shared services, and REST CRUD",
+  "durationMinutes": 90,
+  "learningObjectives": [
+    "User/Issue models",
+    "issueService/userService",
+    "REST CRUD + validation"
+  ],
+  "prerequisites": [
+    "Stage 5",
+    "MongoDB running",
+    ".env MONGODB_URI"
+  ],
+  "syllabusTopics": [
+    "Mongoose",
+    "MERN persistence",
+    "REST CRUD lab"
+  ],
+  "paths": {
+    "readme": "stages/stage-06/README.md",
+    "verification": "stages/stage-06/verification.md",
+    "challenge": "stages/stage-06/challenge.md",
+    "starter": "stages/stage-06/starter/",
+    "solution": "stages/stage-06/solution/"
+  },
+  "starterFiles": [],
+  "solutionFiles": [
+    "solution/.env.example",
+    "solution/server/package.json",
+    "solution/server/src/app.js",
+    "solution/server/src/config/db.js",
+    "solution/server/src/controllers/healthController.js",
+    "solution/server/src/controllers/issueController.js",
+    "solution/server/src/controllers/userController.js",
+    "solution/server/src/middleware/errorHandler.js",
+    "solution/server/src/middleware/requestLogger.js",
+    "solution/server/src/middleware/requireDatabase.js",
+    "solution/server/src/middleware/validateObjectId.js",
+    "solution/server/src/models/Issue.js",
+    "solution/server/src/models/User.js",
+    "solution/server/src/routes/healthRoutes.js",
+    "solution/server/src/routes/index.js",
+    "solution/server/src/routes/issueRoutes.js",
+    "solution/server/src/routes/userRoutes.js",
+    "solution/server/src/server.js",
+    "solution/server/src/services/issueService.js",
+    "solution/server/src/services/userService.js",
+    "solution/server/src/utils/errors.js"
+  ],
+  "instructorDemos": [],
+  "deferredToNextStage": "GraphQL, advanced frontend",
+  "cumulativeProjectNote": "Apply each stage solution on top of prior stages unless this stage README says otherwise. This stage folder contains deltas only for most stages after Stage 1."
+}

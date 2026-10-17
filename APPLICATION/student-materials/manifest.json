@@ -1,0 +1,285 @@
+{
+  "name": "SprintBoard Student Materials",
+  "version": "1.0.0",
+  "description": "Ten incremental coding stages for the SprintBoard workshop. Cumulative assembly required.",
+  "referenceRepositoryNote": "Instructor reference app lives at repository root and is not modified by these packages.",
+  "stages": [
+    {
+      "id": "stage-01",
+      "order": 1,
+      "title": "Application shell, routing, and static issue list",
+      "learningObjectives": [
+        "Create Vite React shell with routes",
+        "Build Layout with navigation",
+        "Render static issue list"
+      ],
+      "prerequisites": [
+        "HTML/CSS/JS",
+        "Node.js installed"
+      ],
+      "durationMinutes": 60,
+      "syllabusTopics": [
+        "React components",
+        "Issue Tracker example",
+        "composition",
+        "children"
+      ],
+      "paths": {
+        "metadata": "stages/stage-01/stage.json",
+        "readme": "stages/stage-01/README.md",
+        "verification": "stages/stage-01/verification.md",
+        "challenge": "stages/stage-01/challenge.md",
+        "starter": "stages/stage-01/starter/",
+        "solution": "stages/stage-01/solution/"
+      }
+    },
+    {
+      "id": "stage-02",
+      "order": 2,
+      "title": "Props, presentational components, and children",
+      "learningObjectives": [
+        "Extract StatusBadge and PriorityBadge",
+        "Pass props from Issues list",
+        "Explain Layout children"
+      ],
+      "prerequisites": [
+        "Stage 1 complete (cumulative client)"
+      ],
+      "durationMinutes": 50,
+      "syllabusTopics": [
+        "props",
+        "children",
+        "stateless components"
+      ],
+      "paths": {
+        "metadata": "stages/stage-02/stage.json",
+        "readme": "stages/stage-02/README.md",
+        "verification": "stages/stage-02/verification.md",
+        "challenge": "stages/stage-02/challenge.md",
+        "starter": "stages/stage-02/starter/",
+        "solution": "stages/stage-02/solution/"
+      }
+    },
+    {
+      "id": "stage-03",
+      "order": 3,
+      "title": "Controlled forms and client-side validation",
+      "learningObjectives": [
+        "Controlled Create Issue form",
+        "Field-level validation",
+        "Local submit preview"
+      ],
+      "prerequisites": [
+        "Stage 2 cumulative client"
+      ],
+      "durationMinutes": 55,
+      "syllabusTopics": [
+        "form validation",
+        "event handling",
+        "state"
+      ],
+      "paths": {
+        "metadata": "stages/stage-03/stage.json",
+        "readme": "stages/stage-03/README.md",
+        "verification": "stages/stage-03/verification.md",
+        "challenge": "stages/stage-03/challenge.md",
+        "starter": "stages/stage-03/starter/",
+        "solution": "stages/stage-03/solution/"
+      }
+    },
+    {
+      "id": "stage-04",
+      "order": 4,
+      "title": "React state, events, and Counter exercise",
+      "learningObjectives": [
+        "Practice state updates",
+        "Async initialization pattern",
+        "Relate to SprintBoard forms"
+      ],
+      "prerequisites": [
+        "Stage 3"
+      ],
+      "durationMinutes": 40,
+      "syllabusTopics": [
+        "state updates",
+        "async initialization",
+        "events"
+      ],
+      "paths": {
+        "metadata": "stages/stage-04/stage.json",
+        "readme": "stages/stage-04/README.md",
+        "verification": "stages/stage-04/verification.md",
+        "challenge": "stages/stage-04/challenge.md",
+        "starter": "stages/stage-04/starter/",
+        "solution": "stages/stage-04/solution/"
+      }
+    },
+    {
+      "id": "stage-05",
+      "order": 5,
+      "title": "Express application, middleware, and health endpoint",
+      "learningObjectives": [
+        "Express app factory",
+        "JSON + logging middleware",
+        "GET /api/health"
+      ],
+      "prerequisites": [
+        "HTTP/JSON basics"
+      ],
+      "durationMinutes": 65,
+      "syllabusTopics": [
+        "Express",
+        "middleware",
+        "REST fundamentals"
+      ],
+      "paths": {
+        "metadata": "stages/stage-05/stage.json",
+        "readme": "stages/stage-05/README.md",
+        "verification": "stages/stage-05/verification.md",
+        "challenge": "stages/stage-05/challenge.md",
+        "starter": "stages/stage-05/starter/",
+        "solution": "stages/stage-05/solution/"
+      }
+    },
+    {
+      "id": "stage-06",
+      "order": 6,
+      "title": "Mongoose models, shared services, and REST CRUD",
+      "learningObjectives": [
+        "User/Issue models",
+        "issueService/userService",
+        "REST CRUD + validation"
+      ],
+      "prerequisites": [
+        "Stage 5",
+        "MongoDB running",
+        ".env MONGODB_URI"
+      ],
+      "durationMinutes": 90,
+      "syllabusTopics": [
+        "Mongoose",
+        "MERN persistence",
+        "REST CRUD lab"
+      ],
+      "paths": {
+        "metadata": "stages/stage-06/stage.json",
+        "readme": "stages/stage-06/README.md",
+        "verification": "stages/stage-06/verification.md",
+        "challenge": "stages/stage-06/challenge.md",
+        "starter": "stages/stage-06/starter/",
+        "solution": "stages/stage-06/solution/"
+      }
+    },
+    {
+      "id": "stage-07",
+      "order": 7,
+      "title": "REST API client and data-driven Dashboard / Issues",
+      "learningObjectives": [
+        "api.js client",
+        "Loading/error states",
+        "Dashboard stats from API"
+      ],
+      "prerequisites": [
+        "Stage 6 server + Stages 1–2 client UI files"
+      ],
+      "durationMinutes": 75,
+      "syllabusTopics": [
+        "fetch integration",
+        "async data loading"
+      ],
+      "paths": {
+        "metadata": "stages/stage-07/stage.json",
+        "readme": "stages/stage-07/README.md",
+        "verification": "stages/stage-07/verification.md",
+        "challenge": "stages/stage-07/challenge.md",
+        "starter": "stages/stage-07/starter/",
+        "solution": "stages/stage-07/solution/"
+      }
+    },
+    {
+      "id": "stage-08",
+      "order": 8,
+      "title": "Users, issue workflows, filters, and assignment",
+      "learningObjectives": [
+        "Users CRUD UI",
+        "Issue create/edit/delete",
+        "Filters and assignee"
+      ],
+      "prerequisites": [
+        "Stage 7 cumulative project"
+      ],
+      "durationMinutes": 90,
+      "syllabusTopics": [
+        "component communication",
+        "lifting state (partial)",
+        "validation"
+      ],
+      "paths": {
+        "metadata": "stages/stage-08/stage.json",
+        "readme": "stages/stage-08/README.md",
+        "verification": "stages/stage-08/verification.md",
+        "challenge": "stages/stage-08/challenge.md",
+        "starter": "stages/stage-08/starter/",
+        "solution": "stages/stage-08/solution/"
+      }
+    },
+    {
+      "id": "stage-09",
+      "order": 9,
+      "title": "GraphQL schema, queries, scalar, and introspection",
+      "learningObjectives": [
+        "GraphQL schema",
+        "issues/issue/users queries",
+        "DateTime scalar",
+        "introspection in dev"
+      ],
+      "prerequisites": [
+        "Stage 6+ services",
+        "Stage 8 REST working"
+      ],
+      "durationMinutes": 75,
+      "syllabusTopics": [
+        "GraphQL schema",
+        "custom scalar",
+        "introspection",
+        "field selection"
+      ],
+      "paths": {
+        "metadata": "stages/stage-09/stage.json",
+        "readme": "stages/stage-09/README.md",
+        "verification": "stages/stage-09/verification.md",
+        "challenge": "stages/stage-09/challenge.md",
+        "starter": "stages/stage-09/starter/",
+        "solution": "stages/stage-09/solution/"
+      }
+    },
+    {
+      "id": "stage-10",
+      "order": 10,
+      "title": "GraphQL mutation, frontend demo, and final verification",
+      "learningObjectives": [
+        "createIssue mutation",
+        "GraphQLDemo UI",
+        "REST vs GraphQL comparison",
+        "run npm test/lint/build"
+      ],
+      "prerequisites": [
+        "Stage 9 GraphQL queries"
+      ],
+      "durationMinutes": 60,
+      "syllabusTopics": [
+        "mutations",
+        "query variables",
+        "error handling"
+      ],
+      "paths": {
+        "metadata": "stages/stage-10/stage.json",
+        "readme": "stages/stage-10/README.md",
+        "verification": "stages/stage-10/verification.md",
+        "challenge": "stages/stage-10/challenge.md",
+        "starter": "stages/stage-10/starter/",
+        "solution": "stages/stage-10/solution/"
+      }
+    }
+  ]
+}

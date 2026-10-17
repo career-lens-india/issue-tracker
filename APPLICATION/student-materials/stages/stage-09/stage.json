@@ -1,0 +1,63 @@
+{
+  "id": "stage-09",
+  "order": 9,
+  "title": "GraphQL schema, queries, scalar, and introspection",
+  "durationMinutes": 75,
+  "learningObjectives": [
+    "GraphQL schema",
+    "issues/issue/users queries",
+    "DateTime scalar",
+    "introspection in dev"
+  ],
+  "prerequisites": [
+    "Stage 6+ services",
+    "Stage 8 REST working"
+  ],
+  "syllabusTopics": [
+    "GraphQL schema",
+    "custom scalar",
+    "introspection",
+    "field selection"
+  ],
+  "paths": {
+    "readme": "stages/stage-09/README.md",
+    "verification": "stages/stage-09/verification.md",
+    "challenge": "stages/stage-09/challenge.md",
+    "starter": "stages/stage-09/starter/",
+    "solution": "stages/stage-09/solution/"
+  },
+  "starterFiles": [],
+  "solutionFiles": [
+    "solution/server/package.json",
+    "solution/server/src/app.js",
+    "solution/server/src/config/db.js",
+    "solution/server/src/controllers/healthController.js",
+    "solution/server/src/controllers/issueController.js",
+    "solution/server/src/controllers/userController.js",
+    "solution/server/src/graphql/enums.js",
+    "solution/server/src/graphql/errors.js",
+    "solution/server/src/graphql/index.js",
+    "solution/server/src/graphql/mappers.js",
+    "solution/server/src/graphql/resolvers/index.js",
+    "solution/server/src/graphql/scalars/DateTime.js",
+    "solution/server/src/graphql/schema/typeDefs.js",
+    "solution/server/src/graphql/setupGraphQL.js",
+    "solution/server/src/middleware/errorHandler.js",
+    "solution/server/src/middleware/requestLogger.js",
+    "solution/server/src/middleware/requireDatabase.js",
+    "solution/server/src/middleware/validateObjectId.js",
+    "solution/server/src/models/Issue.js",
+    "solution/server/src/models/User.js",
+    "solution/server/src/routes/healthRoutes.js",
+    "solution/server/src/routes/index.js",
+    "solution/server/src/routes/issueRoutes.js",
+    "solution/server/src/routes/userRoutes.js",
+    "solution/server/src/server.js",
+    "solution/server/src/services/issueService.js",
+    "solution/server/src/services/userService.js",
+    "solution/server/src/utils/errors.js"
+  ],
+  "instructorDemos": [],
+  "deferredToNextStage": "createIssue mutation (Stage 10)",
+  "cumulativeProjectNote": "Apply each stage solution on top of prior stages unless this stage README says otherwise. This stage folder contains deltas only for most stages after Stage 1."
+}

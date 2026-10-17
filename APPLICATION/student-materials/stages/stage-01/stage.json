@@ -1,0 +1,47 @@
+{
+  "id": "stage-01",
+  "order": 1,
+  "title": "Application shell, routing, and static issue list",
+  "durationMinutes": 60,
+  "learningObjectives": [
+    "Create Vite React shell with routes",
+    "Build Layout with navigation",
+    "Render static issue list"
+  ],
+  "prerequisites": [
+    "HTML/CSS/JS",
+    "Node.js installed"
+  ],
+  "syllabusTopics": [
+    "React components",
+    "Issue Tracker example",
+    "composition",
+    "children"
+  ],
+  "paths": {
+    "readme": "stages/stage-01/README.md",
+    "verification": "stages/stage-01/verification.md",
+    "challenge": "stages/stage-01/challenge.md",
+    "starter": "stages/stage-01/starter/",
+    "solution": "stages/stage-01/solution/"
+  },
+  "starterFiles": [
+    "starter/client/src/App.jsx"
+  ],
+  "solutionFiles": [
+    "solution/client/index.html",
+    "solution/client/package.json",
+    "solution/client/src/App.jsx",
+    "solution/client/src/components/Layout.jsx",
+    "solution/client/src/main.jsx",
+    "solution/client/src/pages/CreateIssue.jsx",
+    "solution/client/src/pages/Dashboard.jsx",
+    "solution/client/src/pages/Issues.jsx",
+    "solution/client/src/pages/Users.jsx",
+    "solution/client/src/styles/global.css",
+    "solution/client/vite.config.js"
+  ],
+  "instructorDemos": [],
+  "deferredToNextStage": "REST API, badges, forms with validation, backend",
+  "cumulativeProjectNote": "Apply each stage solution on top of prior stages unless this stage README says otherwise. This stage folder contains deltas only for most stages after Stage 1."
+}

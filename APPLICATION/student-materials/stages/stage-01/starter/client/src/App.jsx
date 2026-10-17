@@ -1,0 +1,1 @@
+export default function App(){return <p>Stage 1 starter: add SprintBoard shell.</p>};

@@ -1,0 +1,42 @@
+{
+  "id": "stage-05",
+  "order": 5,
+  "title": "Express application, middleware, and health endpoint",
+  "durationMinutes": 65,
+  "learningObjectives": [
+    "Express app factory",
+    "JSON + logging middleware",
+    "GET /api/health"
+  ],
+  "prerequisites": [
+    "HTTP/JSON basics"
+  ],
+  "syllabusTopics": [
+    "Express",
+    "middleware",
+    "REST fundamentals"
+  ],
+  "paths": {
+    "readme": "stages/stage-05/README.md",
+    "verification": "stages/stage-05/verification.md",
+    "challenge": "stages/stage-05/challenge.md",
+    "starter": "stages/stage-05/starter/",
+    "solution": "stages/stage-05/solution/"
+  },
+  "starterFiles": [],
+  "solutionFiles": [
+    "solution/.env.example",
+    "solution/server/package.json",
+    "solution/server/src/app.js",
+    "solution/server/src/controllers/healthController.js",
+    "solution/server/src/middleware/errorHandler.js",
+    "solution/server/src/middleware/requestLogger.js",
+    "solution/server/src/routes/healthRoutes.js",
+    "solution/server/src/routes/index.js",
+    "solution/server/src/server.js",
+    "solution/server/src/utils/errors.js"
+  ],
+  "instructorDemos": [],
+  "deferredToNextStage": "MongoDB (Stage 6)",
+  "cumulativeProjectNote": "Apply each stage solution on top of prior stages unless this stage README says otherwise. This stage folder contains deltas only for most stages after Stage 1."
+}

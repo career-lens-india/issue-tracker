@@ -1,0 +1,37 @@
+{
+  "id": "stage-07",
+  "order": 7,
+  "title": "REST API client and data-driven Dashboard / Issues",
+  "durationMinutes": 75,
+  "learningObjectives": [
+    "api.js client",
+    "Loading/error states",
+    "Dashboard stats from API"
+  ],
+  "prerequisites": [
+    "Stage 6 server + Stages 1–2 client UI files"
+  ],
+  "syllabusTopics": [
+    "fetch integration",
+    "async data loading"
+  ],
+  "paths": {
+    "readme": "stages/stage-07/README.md",
+    "verification": "stages/stage-07/verification.md",
+    "challenge": "stages/stage-07/challenge.md",
+    "starter": "stages/stage-07/starter/",
+    "solution": "stages/stage-07/solution/"
+  },
+  "starterFiles": [],
+  "solutionFiles": [
+    "solution/client/src/components/ErrorMessage.jsx",
+    "solution/client/src/components/LoadingMessage.jsx",
+    "solution/client/src/pages/Dashboard.jsx",
+    "solution/client/src/pages/Issues.jsx",
+    "solution/client/src/services/api.js",
+    "solution/client/vite.config.js"
+  ],
+  "instructorDemos": [],
+  "deferredToNextStage": "GraphQL demo, full filters (Stage 8)",
+  "cumulativeProjectNote": "Apply each stage solution on top of prior stages unless this stage README says otherwise. This stage folder contains deltas only for most stages after Stage 1."
+}

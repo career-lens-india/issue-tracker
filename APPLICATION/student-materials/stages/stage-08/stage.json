@@ -1,0 +1,37 @@
+{
+  "id": "stage-08",
+  "order": 8,
+  "title": "Users, issue workflows, filters, and assignment",
+  "durationMinutes": 90,
+  "learningObjectives": [
+    "Users CRUD UI",
+    "Issue create/edit/delete",
+    "Filters and assignee"
+  ],
+  "prerequisites": [
+    "Stage 7 cumulative project"
+  ],
+  "syllabusTopics": [
+    "component communication",
+    "lifting state (partial)",
+    "validation"
+  ],
+  "paths": {
+    "readme": "stages/stage-08/README.md",
+    "verification": "stages/stage-08/verification.md",
+    "challenge": "stages/stage-08/challenge.md",
+    "starter": "stages/stage-08/starter/",
+    "solution": "stages/stage-08/solution/"
+  },
+  "starterFiles": [],
+  "solutionFiles": [
+    "solution/client/src/App.jsx",
+    "solution/client/src/pages/CreateIssue.jsx",
+    "solution/client/src/pages/IssueDetail.jsx",
+    "solution/client/src/pages/Issues.jsx",
+    "solution/client/src/pages/Users.jsx"
+  ],
+  "instructorDemos": [],
+  "deferredToNextStage": "GraphQL",
+  "cumulativeProjectNote": "Apply each stage solution on top of prior stages unless this stage README says otherwise. This stage folder contains deltas only for most stages after Stage 1."
+}

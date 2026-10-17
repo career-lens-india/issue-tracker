@@ -1,0 +1,40 @@
+{
+  "id": "stage-02",
+  "order": 2,
+  "title": "Props, presentational components, and children",
+  "durationMinutes": 50,
+  "learningObjectives": [
+    "Extract StatusBadge and PriorityBadge",
+    "Pass props from Issues list",
+    "Explain Layout children"
+  ],
+  "prerequisites": [
+    "Stage 1 complete (cumulative client)"
+  ],
+  "syllabusTopics": [
+    "props",
+    "children",
+    "stateless components"
+  ],
+  "paths": {
+    "readme": "stages/stage-02/README.md",
+    "verification": "stages/stage-02/verification.md",
+    "challenge": "stages/stage-02/challenge.md",
+    "starter": "stages/stage-02/starter/",
+    "solution": "stages/stage-02/solution/"
+  },
+  "starterFiles": [
+    "starter/client/src/pages/Issues.jsx"
+  ],
+  "solutionFiles": [
+    "solution/client/src/components/PriorityBadge.jsx",
+    "solution/client/src/components/StatusBadge.jsx",
+    "solution/client/src/pages/Issues.jsx",
+    "solution/instructor-demo/ClassGreetingDemo.jsx"
+  ],
+  "instructorDemos": [
+    "instructor-demo/ClassGreetingDemo.jsx"
+  ],
+  "deferredToNextStage": "API integration",
+  "cumulativeProjectNote": "Apply each stage solution on top of prior stages unless this stage README says otherwise. This stage folder contains deltas only for most stages after Stage 1."
+}

@@ -1,0 +1,35 @@
+{
+  "id": "stage-03",
+  "order": 3,
+  "title": "Controlled forms and client-side validation",
+  "durationMinutes": 55,
+  "learningObjectives": [
+    "Controlled Create Issue form",
+    "Field-level validation",
+    "Local submit preview"
+  ],
+  "prerequisites": [
+    "Stage 2 cumulative client"
+  ],
+  "syllabusTopics": [
+    "form validation",
+    "event handling",
+    "state"
+  ],
+  "paths": {
+    "readme": "stages/stage-03/README.md",
+    "verification": "stages/stage-03/verification.md",
+    "challenge": "stages/stage-03/challenge.md",
+    "starter": "stages/stage-03/starter/",
+    "solution": "stages/stage-03/solution/"
+  },
+  "starterFiles": [
+    "starter/client/src/pages/CreateIssue.jsx"
+  ],
+  "solutionFiles": [
+    "solution/client/src/pages/CreateIssue.jsx"
+  ],
+  "instructorDemos": [],
+  "deferredToNextStage": "REST persistence",
+  "cumulativeProjectNote": "Apply each stage solution on top of prior stages unless this stage README says otherwise. This stage folder contains deltas only for most stages after Stage 1."
+}

@@ -1,0 +1,36 @@
+{
+  "id": "stage-04",
+  "order": 4,
+  "title": "React state, events, and Counter exercise",
+  "durationMinutes": 40,
+  "learningObjectives": [
+    "Practice state updates",
+    "Async initialization pattern",
+    "Relate to SprintBoard forms"
+  ],
+  "prerequisites": [
+    "Stage 3"
+  ],
+  "syllabusTopics": [
+    "state updates",
+    "async initialization",
+    "events"
+  ],
+  "paths": {
+    "readme": "stages/stage-04/README.md",
+    "verification": "stages/stage-04/verification.md",
+    "challenge": "stages/stage-04/challenge.md",
+    "starter": "stages/stage-04/starter/",
+    "solution": "stages/stage-04/solution/"
+  },
+  "starterFiles": [],
+  "solutionFiles": [
+    "solution/demos/CounterDemo.jsx",
+    "solution/instructor-demo/serverless-hello-world.md"
+  ],
+  "instructorDemos": [
+    "demos/CounterDemo.jsx, instructor-demo/serverless-hello-world.md (lecture)"
+  ],
+  "deferredToNextStage": "Counter not mounted in main SprintBoard app",
+  "cumulativeProjectNote": "Apply each stage solution on top of prior stages unless this stage README says otherwise. This stage folder contains deltas only for most stages after Stage 1."
+}

@@ -1,0 +1,64 @@
+{
+  "id": "stage-10",
+  "order": 10,
+  "title": "GraphQL mutation, frontend demo, and final verification",
+  "durationMinutes": 60,
+  "learningObjectives": [
+    "createIssue mutation",
+    "GraphQLDemo UI",
+    "REST vs GraphQL comparison",
+    "run npm test/lint/build"
+  ],
+  "prerequisites": [
+    "Stage 9 GraphQL queries"
+  ],
+  "syllabusTopics": [
+    "mutations",
+    "query variables",
+    "error handling"
+  ],
+  "paths": {
+    "readme": "stages/stage-10/README.md",
+    "verification": "stages/stage-10/verification.md",
+    "challenge": "stages/stage-10/challenge.md",
+    "starter": "stages/stage-10/starter/",
+    "solution": "stages/stage-10/solution/"
+  },
+  "starterFiles": [],
+  "solutionFiles": [
+    "solution/client/src/components/GraphQLDemo.jsx",
+    "solution/client/src/pages/Issues.jsx",
+    "solution/client/src/services/graphql.js",
+    "solution/client/vite.config.js",
+    "solution/server/src/app.js",
+    "solution/server/src/config/db.js",
+    "solution/server/src/controllers/healthController.js",
+    "solution/server/src/controllers/issueController.js",
+    "solution/server/src/controllers/userController.js",
+    "solution/server/src/graphql/enums.js",
+    "solution/server/src/graphql/errors.js",
+    "solution/server/src/graphql/index.js",
+    "solution/server/src/graphql/mappers.js",
+    "solution/server/src/graphql/resolvers/index.js",
+    "solution/server/src/graphql/scalars/DateTime.js",
+    "solution/server/src/graphql/schema/typeDefs.js",
+    "solution/server/src/graphql/setupGraphQL.js",
+    "solution/server/src/middleware/errorHandler.js",
+    "solution/server/src/middleware/requestLogger.js",
+    "solution/server/src/middleware/requireDatabase.js",
+    "solution/server/src/middleware/validateObjectId.js",
+    "solution/server/src/models/Issue.js",
+    "solution/server/src/models/User.js",
+    "solution/server/src/routes/healthRoutes.js",
+    "solution/server/src/routes/index.js",
+    "solution/server/src/routes/issueRoutes.js",
+    "solution/server/src/routes/userRoutes.js",
+    "solution/server/src/server.js",
+    "solution/server/src/services/issueService.js",
+    "solution/server/src/services/userService.js",
+    "solution/server/src/utils/errors.js"
+  ],
+  "instructorDemos": [],
+  "deferredToNextStage": "none (teaching scope complete)",
+  "cumulativeProjectNote": "Apply each stage solution on top of prior stages unless this stage README says otherwise. This stage folder contains deltas only for most stages after Stage 1."
+}
