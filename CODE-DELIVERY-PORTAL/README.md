@@ -122,7 +122,7 @@ npm run build
 | Issue | Check |
 |-------|--------|
 | `MONGODB_URI is required` | Create `.env` from `.env.example` |
-| `Manifest not found` / materials missing on Vercel | Run `npm run vercel-build` in server; ensure monorepo includes `APPLICATION/student-materials` |
+| `Manifest not found` / materials missing on Vercel | Ensure full monorepo clone; `installCommand` runs `sync:materials`. Clear **Output Directory** in Vercel (must not be `public`). |
 | 503 on `/api/stages` | Database not connected (check `APP_MODE` and `MONGODB_URI` for external modes) |
 | Admin login fails | `ADMIN_USERNAME` / `ADMIN_PASSWORD` in `.env` |
 | CORS in custom setup | Set `CLIENT_ORIGIN` to your UI origin |
@@ -135,8 +135,9 @@ Student content lives in **`APPLICATION/student-materials/`** (shared with the S
 
 1. Connect the **full monorepo** (not a sparse checkout).
 2. **Root Directory:** `CODE-DELIVERY-PORTAL/server`
-3. **Build Command:** `npm run vercel-build` (copies `APPLICATION/student-materials` → `server/student-materials` and bundles via `vercel.json` `includeFiles`).
-4. **Environment variables:** `MONGODB_URI`, `APP_MODE=production`, `NODE_ENV=production`, `SESSION_SECRET`, `ADMIN_*`, `STUDENT_ACCESS_PASSWORD`, **`CLIENT_ORIGIN`** = your frontend URL (exact origin, no trailing slash).
+3. **Framework Preset:** Other (not Vite/Next). **Output Directory:** leave **empty** — do not use `public` (API-only project).
+4. **Install** runs `npm install && npm run sync:materials` via `vercel.json` (copies `APPLICATION/student-materials` into `server/student-materials` and bundles it).
+5. **Environment variables:** `MONGODB_URI`, `APP_MODE=production`, `NODE_ENV=production`, `SESSION_SECRET`, `ADMIN_*`, `STUDENT_ACCESS_PASSWORD`, **`CLIENT_ORIGIN`** = your frontend URL (exact origin, no trailing slash).
 
 Local check before deploy:
 
