@@ -10,9 +10,11 @@
     "dev:client": "npm run dev --prefix client",
     "test": "npm test --prefix server",
     "build": "npm run build --prefix client",
-    "lint": "npm run lint --prefix client"
+    "lint": "npm run lint --prefix client",
+    "build": "vite build"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "vite": "^6.0.0"
   }
 }
