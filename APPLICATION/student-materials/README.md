@@ -1,6 +1,8 @@
 # SprintBoard Student Materials
 
-Packages for the future code delivery portal. **Do not replace the instructor reference app** — merge stage `solution/` files into a cumulative student project.
+Packages for the SprintBoard workshop and the **Code Delivery Portal**. **Do not replace the instructor reference app** — merge stage `solution/` files into a cumulative student project.
+
+**Single source of truth:** this folder (`APPLICATION/student-materials/`). The portal copies it into `CODE-DELIVERY-PORTAL/server/student-materials` at deploy time (`npm run sync:materials` / `vercel-build`); edit content here only.
 
 - [manifest.json](./manifest.json) — portal metadata
 - [stages/](./stages/) — ten stage folders

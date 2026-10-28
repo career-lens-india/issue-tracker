@@ -15,7 +15,7 @@ function createApp({ mongoUrl, trustProxy = false } = {}) {
   const app = express();
   if (trustProxy) app.set('trust proxy', 1);
 
-  const clientOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:5174';
+  const clientOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
   app.use(
     cors({
       origin: clientOrigin,

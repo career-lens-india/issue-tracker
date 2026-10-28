@@ -21,7 +21,8 @@ async function getApp() {
       const dbInfo = await initializeDatabase();
       await seedStagesIfNeeded();
 
-      return createApp({ mongoUrl: dbInfo.mongoUri });
+      const trustProxy = Boolean(process.env.VERCEL || process.env.TRUST_PROXY === 'true');
+      return createApp({ mongoUrl: dbInfo.mongoUri, trustProxy });
     })().catch((error) => {
       appPromise = null;
       throw error;

@@ -3,11 +3,12 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '..');
+/** Instructor reference app (client/, server/, .env.example) */
+const APP_ROOT = path.resolve(__dirname, '../..');
 const OUT = path.resolve(__dirname, '../stages');
 
 function read(rel) {
-  return fs.readFileSync(path.join(ROOT, rel), 'utf8');
+  return fs.readFileSync(path.join(APP_ROOT, rel), 'utf8');
 }
 
 function write(stageRel, content) {
@@ -21,7 +22,7 @@ function copyTo(stage, kind, refRel) {
 }
 
 function walkCopy(stage, kind, refDir, outPrefix) {
-  const base = path.join(ROOT, refDir);
+  const base = path.join(APP_ROOT, refDir);
   for (const name of fs.readdirSync(base, { withFileTypes: true })) {
     const rel = `${outPrefix}/${name.name}`;
     if (name.isDirectory()) walkCopy(stage, kind, `${refDir}/${name.name}`, rel);
@@ -34,6 +35,46 @@ function stripGraphQLDemo(src) {
     .replace(/import GraphQLDemo from ['"]\.\.\/components\/GraphQLDemo['"];\r?\n/, '')
     .replace(/\r?\n\s*<GraphQLDemo users=\{users\} onIssueCreated=\{loadIssues\} \/>\r?\n/, '\n');
 }
+
+function stripGraphQLFromApp(src) {
+  return src
+    .replace(/\r?\nconst setupGraphQL = require\('\.\/graphql\/setupGraphQL'\);\r?\n/, '\n')
+    .replace(/\r?\n  setupGraphQL\(app\);\r?\n\r?\n/, '\n\n');
+}
+
+function stripIssueDetailFromApp(src) {
+  return src
+    .replace(/\r?\nimport IssueDetail from '\.\/pages\/IssueDetail';\r?\n/, '\n')
+    .replace(
+      /\r?\n        <Route path="\/issues\/:id" element={<IssueDetail \/>} \/>\r?\n/,
+      '\n',
+    );
+}
+
+const stage5ErrorHandler = `const { AppError, sendError } = require('../utils/errors');
+
+function errorHandler(err, req, res, _next) {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return sendError(res, 400, 'INVALID_JSON', 'Invalid JSON payload');
+  }
+
+  if (err instanceof AppError) {
+    return sendError(res, err.statusCode, err.code, err.message, err.details);
+  }
+
+  console.error('[error]', err.message);
+  return sendError(res, 500, 'INTERNAL_ERROR', 'An unexpected error occurred');
+}
+
+function notFoundHandler(req, res) {
+  return sendError(res, 404, 'NOT_FOUND', \`Route \${req.method} \${req.originalUrl} not found\`);
+}
+
+module.exports = {
+  errorHandler,
+  notFoundHandler,
+};
+`;
 
 function stripMutationTypeDefs(src) {
   return src.replace(/\s*type Mutation \{[\s\S]*?\}\s*/, '\n');
@@ -128,15 +169,11 @@ export default function Issues() {
 }
 `;
 
-fs.rmSync(OUT, { recursive: true, force: true });
-
 const clientPkg = read('client/package.json');
 const indexHtml = read('client/index.html');
 const mainJsx = read('client/src/main.jsx');
 const appFull = read('client/src/App.jsx');
-const appNoDetail = appFull
-  .replace("import IssueDetail from './pages/IssueDetail';\n", '')
-  .replace('        <Route path="/issues/:id" element={<IssueDetail />} />\n', '');
+const appNoDetail = stripIssueDetailFromApp(appFull);
 const layout = read('client/src/components/Layout.jsx');
 const cssBase = read('client/src/styles/global.css').split('.graphql-demo')[0];
 
@@ -309,8 +346,8 @@ const PORT = process.env.PORT || 5000;
 const app = createApp();
 app.listen(PORT, () => console.log('Stage 5 API on', PORT));
 `);
-let app5 = read('server/src/app.js').replace("const setupGraphQL = require('./graphql/setupGraphQL');\n", '').replace('  setupGraphQL(app);\n\n', '');
-write('stage-05/solution/server/src/app.js', app5.replace('function createApp()', 'function createApp()').replace('module.exports = createApp;', 'module.exports = createApp;'));
+let app5 = stripGraphQLFromApp(read('server/src/app.js'));
+write('stage-05/solution/server/src/app.js', app5);
 write('stage-05/solution/server/src/routes/index.js', `const express = require('express');
 const healthRoutes = require('./healthRoutes');
 const router = express.Router();
@@ -323,9 +360,10 @@ function getHealth(req, res) {
 }
 module.exports = { getHealth };
 `);
-for (const f of ['server/src/middleware/requestLogger.js','server/src/middleware/errorHandler.js','server/src/utils/errors.js','server/src/routes/healthRoutes.js']) {
+for (const f of ['server/src/middleware/requestLogger.js','server/src/utils/errors.js','server/src/routes/healthRoutes.js']) {
   copyTo('05', 'solution', f);
 }
+write('stage-05/solution/server/src/middleware/errorHandler.js', stage5ErrorHandler);
 write('stage-05/solution/.env.example', 'PORT=5000\n');
 
 // Stage 06 REST backend
@@ -333,7 +371,7 @@ const pkg6 = JSON.parse(read('server/package.json'));
 ['graphql','graphql-http','@graphql-tools/schema'].forEach((k) => delete pkg6.dependencies[k]);
 write('stage-06/solution/server/package.json', JSON.stringify(pkg6, null, 2));
 const serverCore = [
-  'server/src/server.js','server/src/app.js','server/src/config/db.js',
+  'server/src/server.js','server/src/app.js','server/src/config/db.js','server/src/config/appMode.js',
   'server/src/models/User.js','server/src/models/Issue.js',
   'server/src/services/issueService.js','server/src/services/userService.js',
   'server/src/controllers/issueController.js','server/src/controllers/userController.js',
@@ -344,7 +382,7 @@ const serverCore = [
 ];
 for (const f of serverCore) {
   let c = read(f);
-  if (f.endsWith('app.js')) c = c.replace("const setupGraphQL = require('./graphql/setupGraphQL');\n", '').replace('  setupGraphQL(app);\n\n', '');
+  if (f.endsWith('app.js')) c = stripGraphQLFromApp(c);
   write(`stage-06/solution/${f}`, c);
 }
 write('stage-06/solution/.env.example', read('.env.example'));
@@ -373,7 +411,7 @@ write('stage-08/solution/client/src/pages/Issues.jsx', stripGraphQLDemo(read('cl
 // Stage 09 GraphQL queries only
 write('stage-09/solution/server/package.json', read('server/package.json'));
 for (const f of serverCore) write(`stage-09/solution/${f}`, read(f));
-const gqlRoot = path.join(ROOT, 'server/src/graphql');
+const gqlRoot = path.join(APP_ROOT, 'server/src/graphql');
 function copyGql(stage, transform) {
   function rec(dir, rel = '') {
     for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {

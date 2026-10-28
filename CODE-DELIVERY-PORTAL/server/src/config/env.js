@@ -1,8 +1,17 @@
+const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+function getPortalRoot() {
+  return path.resolve(__dirname, '../../..');
+}
+
+function getServerRoot() {
+  return path.resolve(__dirname, '../..');
+}
+
 function loadEnv() {
-  const envPath = path.join(__dirname, '../../../.env');
+  const envPath = path.join(getPortalRoot(), '.env');
   const result = require('dotenv').config({ path: envPath });
   if (result.error && process.env.NODE_ENV !== 'test') {
     // eslint-disable-next-line no-console
@@ -10,12 +19,52 @@ function loadEnv() {
   }
 }
 
+function listMaterialsRootCandidates() {
+  const portalRoot = getPortalRoot();
+  const serverRoot = getServerRoot();
+  const configured = (process.env.STUDENT_MATERIALS_PATH || '').trim();
+  const candidates = [];
+
+  if (configured) {
+    candidates.push(
+      path.isAbsolute(configured)
+        ? configured
+        : path.resolve(portalRoot, configured)
+    );
+  }
+
+  // Bundled copy (Vercel / serverless — see scripts/sync-student-materials.mjs)
+  candidates.push(path.join(serverRoot, 'student-materials'));
+
+  // Monorepo: shared with APPLICATION workshop app
+  candidates.push(path.resolve(portalRoot, '../APPLICATION/student-materials'));
+  candidates.push(path.resolve(portalRoot, '../../APPLICATION/student-materials'));
+
+  if (!configured) {
+    candidates.push(path.resolve(portalRoot, '../APPLICATION/student-materials'));
+  }
+
+  const seen = new Set();
+  return candidates.filter((p) => {
+    const key = path.normalize(p);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function getMaterialsRoot() {
-  const configured = process.env.STUDENT_MATERIALS_PATH || '../APPLICATION/student-materials';
-  const resolved = path.isAbsolute(configured)
-    ? configured
-    : path.resolve(__dirname, '../../../', configured);
-  return path.normalize(resolved);
+  for (const root of listMaterialsRootCandidates()) {
+    const manifestPath = path.join(root, 'manifest.json');
+    if (fs.existsSync(manifestPath)) {
+      return path.normalize(root);
+    }
+  }
+
+  const tried = listMaterialsRootCandidates();
+  throw new Error(
+    `Student materials not found. Set STUDENT_MATERIALS_PATH or run: node scripts/sync-student-materials.mjs. Tried:\n${tried.map((p) => `  - ${p}`).join('\n')}`
+  );
 }
 
 function validateProductionConfig() {
@@ -43,6 +92,8 @@ function validateProductionConfig() {
   if (!(process.env.STUDENT_ACCESS_PASSWORD || '').trim()) {
     throw new Error('STUDENT_ACCESS_PASSWORD is required in production');
   }
+
+  getMaterialsRoot();
 }
 
 function getSessionSecret() {
@@ -57,6 +108,7 @@ function getSessionSecret() {
 module.exports = {
   loadEnv,
   getMaterialsRoot,
+  listMaterialsRootCandidates,
   validateProductionConfig,
   getSessionSecret,
 };

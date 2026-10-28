@@ -2,21 +2,16 @@ require('dotenv').config({ path: require('path').join(__dirname, '../../.env') }
 require('dotenv').config();
 
 const createApp = require('./app');
-const { connectDatabase, disconnectDatabase } = require('./config/db');
-
+const { initializeDatabase, shutdownDatabase } = require('./config/db');
 const PORT = process.env.PORT || 5000;
 
 async function startServer() {
-  const uri = process.env.MONGODB_URI;
-  if (!uri) {
-    console.error('MONGODB_URI is not set. Copy .env.example to .env and configure MongoDB.');
-    process.exit(1);
-  }
-
+  let dbInfo;
   try {
-    await connectDatabase(uri);
+    dbInfo = await initializeDatabase();
+    console.log(`[db] APP_MODE=${dbInfo.appMode} storage=${dbInfo.storage}`);
   } catch (err) {
-    console.error('Failed to connect to MongoDB:', err.message);
+    console.error('Failed to initialize database:', err.message);
     process.exit(1);
   }
 
@@ -29,7 +24,7 @@ async function startServer() {
     console.log(`\n${signal} received. Shutting down...`);
     server.close(async () => {
       try {
-        await disconnectDatabase();
+        await shutdownDatabase();
         process.exit(0);
       } catch (err) {
         console.error('Error during shutdown:', err.message);

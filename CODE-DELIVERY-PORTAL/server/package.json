@@ -4,6 +4,8 @@
   "private": true,
   "main": "src/server.js",
   "scripts": {
+    "sync:materials": "node ../scripts/sync-student-materials.mjs",
+    "vercel-build": "npm run sync:materials",
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "test": "jest --runInBand --forceExit"
