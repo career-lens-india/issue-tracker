@@ -66,9 +66,7 @@ export default function HomePage() {
           {stages.map((s) => (
             <article key={s.id} className="stage-card">
               <div className="card-top">
-                <span className="stage-num">
-                  {s.status === 'LIVE' ? 'Current module' : 'Previous module'}
-                </span>
+                <span className="stage-num">Stage {s.order}</span>
                 <span className={`badge ${statusClass(s.status)}`}>{statusLabel(s.status)}</span>
               </div>
               <h3>{s.title}</h3>

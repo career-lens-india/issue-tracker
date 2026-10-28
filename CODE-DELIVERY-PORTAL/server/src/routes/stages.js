@@ -38,7 +38,8 @@ router.get('/', requireDb, async (req, res, next) => {
         syllabusTopics: s.syllabusTopics,
         status: statusMap[s.id] || 'COMING_SOON',
       }))
-      .filter((s) => s.status === 'LIVE' || s.status === 'COMPLETED');
+      .filter((s) => s.status === 'LIVE' || s.status === 'COMPLETED')
+      .sort((a, b) => a.order - b.order);
     return sendSuccess(res, { stages });
   } catch (err) {
     return next(err);

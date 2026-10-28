@@ -95,6 +95,17 @@ a {
   align-items: center;
 }
 
+.stage-num,
+.stage-order-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted, #64748b);
+}
+
+.stage-order-label {
+  margin: 0 0 0.25rem;
+}
+
 .badge {
   font-size: 0.75rem;
   padding: 0.2rem 0.5rem;

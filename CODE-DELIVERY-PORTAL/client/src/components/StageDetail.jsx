@@ -103,7 +103,8 @@ export default function StageDetail({ stageId, listMeta, onBack }) {
     <div className="stage-detail">
       <button type="button" className="link-back" onClick={onBack}>← Workshop modules</button>
       <header className="detail-header">
-        <h2>{meta?.title}</h2>
+        <p className="stage-order-label">Stage {meta?.order ?? stage?.order}</p>
+        <h2>{meta?.title ?? stage?.title}</h2>
         <span className={`badge ${statusClass(status)}`}>{statusLabel(status)}</span>
       </header>
 
