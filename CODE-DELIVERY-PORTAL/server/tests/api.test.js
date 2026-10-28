@@ -28,6 +28,20 @@ describe('portal API', () => {
     expect(res.body.error.code).toBe('STUDENT_ACCESS_REQUIRED');
   });
 
+  test('workshop token grants access without session cookie', async () => {
+    await setStageStatuses({ 'stage-01': 'LIVE' });
+    const login = await request(app)
+      .post('/api/access/login')
+      .send({ password: process.env.STUDENT_ACCESS_PASSWORD || 'workshop-session-pass' });
+    expect(login.status).toBe(200);
+    expect(login.body.data.token).toBeTruthy();
+    const res = await request(app).get(
+      `/api/stages?token=${encodeURIComponent(login.body.data.token)}`
+    );
+    expect(res.status).toBe(200);
+    expect(res.body.data.stages).toHaveLength(1);
+  });
+
   test('student list hides unreleased stages', async () => {
     const agent = request.agent(app);
     await loginStudent(agent);

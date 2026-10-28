@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
 const { sendSuccess, sendError } = require('../utils/errors');
 const { saveSession } = require('../utils/sessionSave');
+const { signWorkshopToken } = require('../utils/portalToken');
 const {
   isStudentAccessConfigured,
   hasStudentAccess,
@@ -29,6 +30,7 @@ function verifyStudentPassword(password) {
 }
 
 router.get('/session', (req, res) => {
+  res.set('Cache-Control', 'no-store');
   const required = isStudentAccessConfigured();
   return sendSuccess(res, {
     required,
@@ -53,7 +55,8 @@ router.post('/login', loginLimiter, (req, res) => {
     return sendError(res, 401, 'INVALID_CREDENTIALS', 'Incorrect workshop password');
   }
   req.session.studentAccess = true;
-  return saveSession(req, res, () => sendSuccess(res, { authenticated: true }));
+  const token = signWorkshopToken();
+  return saveSession(req, res, () => sendSuccess(res, { authenticated: true, token }));
 });
 
 router.post('/logout', (req, res) => {

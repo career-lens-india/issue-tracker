@@ -10,7 +10,7 @@ const {
 const { sendSuccess, sendError } = require('../utils/errors');
 const { saveSession } = require('../utils/sessionSave');
 const { getSessionCookieOptions } = require('../config/sessionCookie');
-const { signAdminToken, isAdminAuthenticated } = require('../utils/adminToken');
+const { signAdminToken, isAdminAuthenticated } = require('../utils/portalToken');
 const { isDbReady } = require('../config/db');
 
 const router = express.Router();

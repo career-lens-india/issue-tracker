@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { accessLogin, accessSession } from '../api';
+import { accessLogin, accessSession, getWorkshopToken } from '../api';
 
 export default function StudentAccessGate({ children }) {
   const [checking, setChecking] = useState(true);
@@ -11,7 +11,8 @@ export default function StudentAccessGate({ children }) {
     let cancelled = false;
     async function check() {
       try {
-        const data = await accessSession();
+        const stored = getWorkshopToken();
+        const data = await accessSession(stored || undefined);
         if (!cancelled) {
           setAllowed(!data.required || data.authenticated);
         }
@@ -31,7 +32,11 @@ export default function StudentAccessGate({ children }) {
     e.preventDefault();
     setError('');
     try {
-      await accessLogin(password);
+      const data = await accessLogin(password);
+      if (!data.token) {
+        setError('Server did not return a workshop token. Redeploy the API.');
+        return;
+      }
       setAllowed(true);
       setPassword('');
     } catch (err) {

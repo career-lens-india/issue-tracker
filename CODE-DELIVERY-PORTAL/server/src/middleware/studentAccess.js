@@ -1,13 +1,12 @@
 const { sendError } = require('../utils/errors');
+const { isWorkshopAuthenticated } = require('../utils/portalToken');
 
 function isStudentAccessConfigured() {
   return Boolean((process.env.STUDENT_ACCESS_PASSWORD || '').trim());
 }
 
 function hasStudentAccess(req) {
-  if (req.session?.admin) return true;
-  if (req.session?.studentAccess) return true;
-  return false;
+  return isWorkshopAuthenticated(req);
 }
 
 function requireStudentAccess(req, res, next) {

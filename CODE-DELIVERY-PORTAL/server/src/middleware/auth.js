@@ -1,5 +1,5 @@
 const { sendError } = require('../utils/errors');
-const { isAdminAuthenticated } = require('../utils/adminToken');
+const { isAdminAuthenticated } = require('../utils/portalToken');
 
 function requireAdmin(req, res, next) {
   if (isAdminAuthenticated(req)) {

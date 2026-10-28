@@ -1,5 +1,6 @@
 const base = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
 const ADMIN_TOKEN_KEY = 'portal.adminToken';
+const WORKSHOP_TOKEN_KEY = 'portal.workshopToken';
 
 function getAdminToken() {
   try {
@@ -18,17 +19,36 @@ function setAdminToken(token) {
   }
 }
 
-/** Append signed admin token as query param (reliable on cross-origin Vercel). */
-function adminApiUrl(path, tokenOverride) {
-  const token = tokenOverride || getAdminToken();
+function getWorkshopToken() {
+  try {
+    return sessionStorage.getItem(WORKSHOP_TOKEN_KEY) || '';
+  } catch {
+    return '';
+  }
+}
+
+function setWorkshopToken(token) {
+  try {
+    if (token) sessionStorage.setItem(WORKSHOP_TOKEN_KEY, token);
+    else sessionStorage.removeItem(WORKSHOP_TOKEN_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+function withToken(path, token) {
   const pathNorm = path.startsWith('/') ? path : `/${path}`;
   if (!token) return `${base}${pathNorm}`;
   const sep = pathNorm.includes('?') ? '&' : '?';
   return `${base}${pathNorm}${sep}token=${encodeURIComponent(token)}`;
 }
 
-function adminHeaders(extra = {}) {
-  return { ...extra };
+function adminApiUrl(path, tokenOverride) {
+  return withToken(path, tokenOverride || getAdminToken());
+}
+
+function workshopApiUrl(path, tokenOverride) {
+  return withToken(path, tokenOverride || getWorkshopToken());
 }
 
 async function parseJson(res) {
@@ -43,12 +63,16 @@ async function parseJson(res) {
   return body.data;
 }
 
-export async function accessSession() {
-  return parseJson(await fetch(`${base}/api/access/session`, { credentials: 'include' }));
+export async function accessSession(tokenOverride) {
+  return parseJson(
+    await fetch(workshopApiUrl('/api/access/session', tokenOverride), {
+      credentials: 'include',
+    })
+  );
 }
 
 export async function accessLogin(password) {
-  return parseJson(
+  const data = await parseJson(
     await fetch(`${base}/api/access/login`, {
       method: 'POST',
       credentials: 'include',
@@ -56,19 +80,31 @@ export async function accessLogin(password) {
       body: JSON.stringify({ password }),
     })
   );
+  if (data.token) setWorkshopToken(data.token);
+  return data;
 }
 
 export async function fetchStages() {
-  return parseJson(await fetch(`${base}/api/stages`, { credentials: 'include' }));
+  return parseJson(
+    await fetch(workshopApiUrl('/api/stages'), {
+      credentials: 'include',
+    })
+  );
 }
 
 export async function fetchStage(stageId) {
-  return parseJson(await fetch(`${base}/api/stages/${stageId}`, { credentials: 'include' }));
+  return parseJson(
+    await fetch(workshopApiUrl(`/api/stages/${stageId}`), {
+      credentials: 'include',
+    })
+  );
 }
 
 export async function fetchStageFile(stageId, filePath) {
   return parseJson(
-    await fetch(`${base}/api/stages/${stageId}/files/${filePath}`, { credentials: 'include' })
+    await fetch(workshopApiUrl(`/api/stages/${stageId}/files/${filePath}`), {
+      credentials: 'include',
+    })
   );
 }
 
@@ -135,4 +171,4 @@ export function downloadFile(stageId, filePath, content) {
   URL.revokeObjectURL(url);
 }
 
-export { getAdminToken };
+export { getAdminToken, getWorkshopToken };
