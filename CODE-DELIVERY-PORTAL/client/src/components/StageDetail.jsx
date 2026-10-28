@@ -3,7 +3,16 @@ import { fetchStage, fetchStageFile } from '../api';
 import { statusClass, statusLabel } from '../statusLabels';
 import CodeViewer from './CodeViewer';
 
-const TABS = ['overview', 'instructions', 'starter', 'verification', 'challenge', 'solution'];
+const TAB_DEFS = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'instructions', label: 'Instructions' },
+  { id: 'starter', label: 'Starter', files: 'starter' },
+  { id: 'verification', label: 'Verification' },
+  { id: 'challenge', label: 'Challenge' },
+  { id: 'recapBefore', label: 'Before solution', field: 'recapBeforeSolution' },
+  { id: 'solution', label: 'Solution', files: 'solution', completedOnly: true },
+  { id: 'recapAfter', label: 'After solution', field: 'recapAfterSolution', completedOnly: true },
+];
 
 export default function StageDetail({ stageId, listMeta, onBack }) {
   const [stage, setStage] = useState(null);
@@ -63,8 +72,14 @@ export default function StageDetail({ stageId, listMeta, onBack }) {
     };
   }, [selectedFile, stageId, stage]);
 
-  const showSolution = status === 'COMPLETED';
-  const visibleTabs = TABS.filter((t) => t !== 'solution' || showSolution);
+  function tabVisible(def) {
+    if (def.completedOnly && status !== 'COMPLETED') return false;
+    if (def.field && !stage?.[def.field]) return false;
+    if (def.files === 'solution' && status !== 'COMPLETED') return false;
+    return true;
+  }
+
+  const visibleTabs = TAB_DEFS.filter(tabVisible);
 
   function renderMarkdownBlock(text, emptyLabel) {
     if (!text) {
@@ -121,15 +136,31 @@ export default function StageDetail({ stageId, listMeta, onBack }) {
 
       {stage && (
         <>
+          {status === 'LIVE' && stage.recapBeforeSolution && (
+            <p className="learning-callout">
+              Finish the verification checklist, then read <strong>Before solution</strong> to solidify
+              what you learned before your instructor marks this stage completed.
+            </p>
+          )}
+          {status === 'COMPLETED' && stage.recapAfterSolution && (
+            <p className="learning-callout">
+              Compare your work with the <strong>Solution</strong> tab, then read{' '}
+              <strong>After solution</strong> to lock in concepts for the next stage.
+            </p>
+          )}
+
           <nav className="tab-nav">
             {visibleTabs.map((t) => (
               <button
-                key={t}
+                key={t.id}
                 type="button"
-                className={tab === t ? 'active' : ''}
-                onClick={() => setTab(t)}
+                className={tab === t.id ? 'active' : ''}
+                onClick={() => {
+                  setTab(t.id);
+                  setSelectedFile('');
+                }}
               >
-                {t.charAt(0).toUpperCase() + t.slice(1)}
+                {t.label}
               </button>
             ))}
           </nav>
@@ -149,6 +180,16 @@ export default function StageDetail({ stageId, listMeta, onBack }) {
             {tab === 'instructions' && renderMarkdownBlock(stage.instructions, 'No instructions available.')}
             {tab === 'verification' && renderMarkdownBlock(stage.verification, 'No verification checklist.')}
             {tab === 'challenge' && renderMarkdownBlock(stage.challenge, 'No challenge instructions.')}
+            {tab === 'recapBefore' &&
+              renderMarkdownBlock(
+                stage.recapBeforeSolution,
+                'Recap notes for this stage are not published yet.'
+              )}
+            {tab === 'recapAfter' &&
+              renderMarkdownBlock(
+                stage.recapAfterSolution,
+                'Post-solution recap will appear when your instructor marks this stage completed.'
+              )}
             {(tab === 'starter' || tab === 'solution') && (
               <div className="files-layout">
                 {fileTree(

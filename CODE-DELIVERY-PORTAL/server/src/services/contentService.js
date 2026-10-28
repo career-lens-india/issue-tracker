@@ -87,6 +87,14 @@ function readTreeFile(stageId, category, fileRel) {
   return { path: normalized, content };
 }
 
+function readOptionalStageMarkdown(stageId, filename) {
+  const filePath = safeResolveUnderStage(stageId, filename);
+  if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+    return null;
+  }
+  return fs.readFileSync(filePath, 'utf8');
+}
+
 function getPublicStageDetail(stageMeta, release, status) {
   const base = {
     id: stageMeta.id,
@@ -110,6 +118,11 @@ function getPublicStageDetail(stageMeta, release, status) {
     instructions: docs.readme,
     verification: docs.verification,
     challenge: docs.challenge,
+    recapBeforeSolution: readOptionalStageMarkdown(stageMeta.id, 'recap-before-solution.md'),
+    recapAfterSolution:
+      status === 'COMPLETED'
+        ? readOptionalStageMarkdown(stageMeta.id, 'recap-after-solution.md')
+        : null,
     starterFiles: listTree(stageMeta.id, 'starter'),
     solutionFiles: status === 'COMPLETED' ? listTree(stageMeta.id, 'solution') : [],
   };

@@ -106,6 +106,15 @@ a {
   margin: 0 0 0.25rem;
 }
 
+.learning-callout {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+}
+
 .badge {
   font-size: 0.75rem;
   padding: 0.2rem 0.5rem;
