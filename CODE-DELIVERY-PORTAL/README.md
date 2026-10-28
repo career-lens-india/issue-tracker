@@ -125,6 +125,7 @@ npm run build
 | `Manifest not found` / materials missing on Vercel | Ensure full monorepo clone; `installCommand` runs `sync:materials`. Clear **Output Directory** in Vercel (must not be `public`). |
 | 503 on `/api/stages` | Database not connected (check `APP_MODE` and `MONGODB_URI` for external modes) |
 | Admin login fails | `ADMIN_USERNAME` / `ADMIN_PASSWORD` in `.env` |
+| `API_INITIALIZATION_FAILED` on Vercel | **Runtime Logs** in Vercel dashboard, or set `DEBUG_INIT=true` and reload `/api/health` for `detail`. Usually missing/invalid env (see Deploy section) or MongoDB Atlas network access. |
 | CORS in custom setup | Set `CLIENT_ORIGIN` to your UI origin |
 
 ## Deploy on Vercel (separate frontend + API)
@@ -137,7 +138,7 @@ Student content lives in **`APPLICATION/student-materials/`** (shared with the S
 2. **Root Directory:** `CODE-DELIVERY-PORTAL/server`
 3. **Framework Preset:** Other (not Vite/Next). **Output Directory:** leave **empty** — do not use `public` (API-only project).
 4. **Install** runs `npm install && npm run sync:materials` via `vercel.json` (copies `APPLICATION/student-materials` into `server/student-materials` and bundles it).
-5. **Environment variables:** `MONGODB_URI`, `APP_MODE=production`, `NODE_ENV=production`, `SESSION_SECRET`, `ADMIN_*`, `STUDENT_ACCESS_PASSWORD`, **`CLIENT_ORIGIN`** = your frontend URL (exact origin, no trailing slash).
+5. **Environment variables:** `MONGODB_URI`, `APP_MODE=production`, `NODE_ENV=production`, `SESSION_SECRET` (32+ chars), `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `STUDENT_ACCESS_PASSWORD`, **`CLIENT_ORIGIN`** = your frontend URL (exact origin, no trailing slash). Optional: `DEBUG_INIT=true` temporarily to see init error text in `/api/health` JSON (`detail` field).
 
 Local check before deploy:
 

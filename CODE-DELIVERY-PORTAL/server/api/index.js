@@ -43,9 +43,14 @@ module.exports = async (req, res) => {
       stack: error.stack,
     });
 
-    return res.status(500).json({
+    const body = {
       error: 'API_INITIALIZATION_FAILED',
       message: 'The API could not be initialized.',
-    });
+    };
+    if (process.env.DEBUG_INIT === 'true') {
+      body.detail = error.message;
+    }
+
+    return res.status(500).json(body);
   }
 };

@@ -8,6 +8,7 @@ const {
   updateStageStatus,
 } = require('../services/releaseService');
 const { sendSuccess, sendError } = require('../utils/errors');
+const { saveSession } = require('../utils/sessionSave');
 const { isDbReady } = require('../config/db');
 
 const router = express.Router();
@@ -48,7 +49,7 @@ router.post('/login', loginLimiter, requireDb, async (req, res) => {
     return sendError(res, 401, 'INVALID_CREDENTIALS', 'Invalid credentials');
   }
   req.session.admin = true;
-  return sendSuccess(res, { username: expectedUser });
+  return saveSession(req, res, () => sendSuccess(res, { username: expectedUser }));
 });
 
 router.post('/logout', (req, res) => {

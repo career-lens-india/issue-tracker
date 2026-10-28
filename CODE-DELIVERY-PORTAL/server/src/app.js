@@ -12,6 +12,25 @@ const stagesRouter = require('./routes/stages');
 const adminRouter = require('./routes/admin');
 const accessRouter = require('./routes/access');
 
+function getSessionCookieOptions(clientOrigin) {
+  const isProd = process.env.NODE_ENV === 'production';
+  const serveTogether = process.env.SERVE_CLIENT === 'true';
+  const localDev =
+    !clientOrigin ||
+    clientOrigin.includes('localhost') ||
+    clientOrigin.includes('127.0.0.1');
+  // Frontend and API on different Vercel projects → cross-origin credentialed fetch
+  const separateDeploy =
+    isProd && !serveTogether && !localDev && Boolean(process.env.VERCEL);
+
+  return {
+    httpOnly: true,
+    sameSite: separateDeploy ? 'none' : 'lax',
+    secure: isProd,
+    maxAge: 8 * 60 * 60 * 1000,
+  };
+}
+
 function createApp({ mongoUrl, trustProxy = false } = {}) {
   const app = express();
 
@@ -54,12 +73,7 @@ function createApp({ mongoUrl, trustProxy = false } = {}) {
     secret: getSessionSecret(),
     resave: false,
     saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 8 * 60 * 60 * 1000,
-    },
+    cookie: getSessionCookieOptions(clientOrigin),
   };
 
   if (mongoUrl) {

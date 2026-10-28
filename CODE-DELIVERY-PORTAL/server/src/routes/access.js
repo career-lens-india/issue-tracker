@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
 const { sendSuccess, sendError } = require('../utils/errors');
+const { saveSession } = require('../utils/sessionSave');
 const {
   isStudentAccessConfigured,
   hasStudentAccess,
@@ -52,12 +53,12 @@ router.post('/login', loginLimiter, (req, res) => {
     return sendError(res, 401, 'INVALID_CREDENTIALS', 'Incorrect workshop password');
   }
   req.session.studentAccess = true;
-  return sendSuccess(res, { authenticated: true });
+  return saveSession(req, res, () => sendSuccess(res, { authenticated: true }));
 });
 
 router.post('/logout', (req, res) => {
   req.session.studentAccess = false;
-  return sendSuccess(res, { authenticated: false });
+  return saveSession(req, res, () => sendSuccess(res, { authenticated: false }));
 });
 
 module.exports = router;
