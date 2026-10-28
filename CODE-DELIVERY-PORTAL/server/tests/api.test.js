@@ -137,8 +137,8 @@ describe('portal API', () => {
     const session = await agent.get('/api/admin/session');
     expect(session.body.data.authenticated).toBe(true);
     const tokenSession = await request(app)
-      .get('/api/admin/session')
-      .set('Authorization', `Bearer ${login.body.data.token}`);
+      .post('/api/admin/session')
+      .send({ token: login.body.data.token });
     expect(tokenSession.body.data.authenticated).toBe(true);
     const logout = await agent.post('/api/admin/logout');
     expect(logout.status).toBe(200);

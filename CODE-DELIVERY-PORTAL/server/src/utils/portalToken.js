@@ -19,6 +19,7 @@ function signPortalToken(role) {
 
 function verifyPortalToken(token, expectedRole) {
   if (!token || typeof token !== 'string') return false;
+  token = token.trim();
   const secret = getSessionSecret();
   const dot = token.lastIndexOf('.');
   if (dot <= 0) return false;
@@ -64,6 +65,8 @@ function extractRequestToken(req) {
   if (bearer) return bearer;
   const headerToken = req.headers['x-portal-token'] || req.headers['x-admin-token'];
   if (typeof headerToken === 'string' && headerToken.trim()) return headerToken.trim();
+  const bodyToken = req.body?.token;
+  if (typeof bodyToken === 'string' && bodyToken.trim()) return bodyToken.trim();
   return (
     readQueryParam(req, 'token') ||
     readQueryParam(req, 'portalToken') ||

@@ -34,6 +34,9 @@ async function getApp() {
 
 module.exports = async (req, res) => {
   try {
+    if (!req.originalUrl && req.url) {
+      req.originalUrl = req.url;
+    }
     const app = await getApp();
     return app(req, res);
   } catch (error) {

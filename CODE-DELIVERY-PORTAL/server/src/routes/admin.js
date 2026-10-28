@@ -63,15 +63,33 @@ router.post('/logout', (req, res) => {
   });
 });
 
-router.get('/session', (req, res) => {
-  res.set('Cache-Control', 'no-store');
+function adminSessionData(req) {
   if (isAdminAuthenticated(req)) {
-    return sendSuccess(res, {
+    return {
       authenticated: true,
       username: process.env.ADMIN_USERNAME || 'admin',
-    });
+    };
   }
-  return sendSuccess(res, { authenticated: false });
+  return {
+    authenticated: false,
+    auth: {
+      message:
+        'POST /api/admin/login returns a token. The session endpoint does not use cookies on split deploys.',
+      header: 'Authorization: Bearer <token>',
+      query: '/api/admin/session?token=<token>',
+      body: 'POST /api/admin/session with JSON { "token": "<token>" }',
+    },
+  };
+}
+
+router.get('/session', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  return sendSuccess(res, adminSessionData(req));
+});
+
+router.post('/session', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  return sendSuccess(res, adminSessionData(req));
 });
 
 router.get('/stages', requireAdmin, requireDb, async (req, res, next) => {
