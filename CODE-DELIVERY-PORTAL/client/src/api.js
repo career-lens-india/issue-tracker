@@ -1,4 +1,11 @@
+/**
+ * API client — split frontend/API deploy (e.g. two Vercel projects).
+ * Auth is ONLY via signed tokens: POST login returns `token`, stored in sessionStorage,
+ * sent on every protected request as `Authorization: Bearer <token>`.
+ * Session cookies are not used cross-origin.
+ */
 const base = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+
 const ADMIN_TOKEN_KEY = 'portal.adminToken';
 const WORKSHOP_TOKEN_KEY = 'portal.workshopToken';
 
@@ -36,19 +43,27 @@ function setWorkshopToken(token) {
   }
 }
 
-function withToken(path, token) {
+function apiUrl(path) {
   const pathNorm = path.startsWith('/') ? path : `/${path}`;
-  if (!token) return `${base}${pathNorm}`;
-  const sep = pathNorm.includes('?') ? '&' : '?';
-  return `${base}${pathNorm}${sep}token=${encodeURIComponent(token)}`;
+  return `${base}${pathNorm}`;
 }
 
-function adminApiUrl(path, tokenOverride) {
-  return withToken(path, tokenOverride || getAdminToken());
+function bearerHeaders(token) {
+  const headers = {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
 }
 
-function workshopApiUrl(path, tokenOverride) {
-  return withToken(path, tokenOverride || getWorkshopToken());
+async function portalFetch(path, { method = 'GET', token, jsonBody } = {}) {
+  const headers = bearerHeaders(token);
+  let body;
+  if (jsonBody !== undefined) {
+    headers['Content-Type'] = 'application/json';
+    body = JSON.stringify(jsonBody);
+  }
+  return fetch(apiUrl(path), { method, headers, body });
 }
 
 async function parseJson(res) {
@@ -64,68 +79,64 @@ async function parseJson(res) {
 }
 
 export async function accessSession(tokenOverride) {
-  return parseJson(
-    await fetch(workshopApiUrl('/api/access/session', tokenOverride), {
-      credentials: 'include',
-    })
-  );
+  const token = tokenOverride || getWorkshopToken();
+  return parseJson(await portalFetch('/api/access/session', { token }));
 }
 
 export async function accessLogin(password) {
   const data = await parseJson(
-    await fetch(`${base}/api/access/login`, {
+    await portalFetch('/api/access/login', {
       method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password }),
+      jsonBody: { password },
     })
   );
-  if (data.token) setWorkshopToken(data.token);
+  if (!data.token) {
+    throw new Error('Workshop login did not return a token. Redeploy the API.');
+  }
+  setWorkshopToken(data.token);
   return data;
 }
 
 export async function fetchStages() {
-  return parseJson(
-    await fetch(workshopApiUrl('/api/stages'), {
-      credentials: 'include',
-    })
-  );
+  const token = getWorkshopToken();
+  if (!token) {
+    const err = new Error('Workshop password required');
+    err.code = 'STUDENT_ACCESS_REQUIRED';
+    throw err;
+  }
+  return parseJson(await portalFetch('/api/stages', { token }));
 }
 
 export async function fetchStage(stageId) {
   return parseJson(
-    await fetch(workshopApiUrl(`/api/stages/${stageId}`), {
-      credentials: 'include',
-    })
+    await portalFetch(`/api/stages/${stageId}`, { token: getWorkshopToken() })
   );
 }
 
 export async function fetchStageFile(stageId, filePath) {
   return parseJson(
-    await fetch(workshopApiUrl(`/api/stages/${stageId}/files/${filePath}`), {
-      credentials: 'include',
+    await portalFetch(`/api/stages/${stageId}/files/${filePath}`, {
+      token: getWorkshopToken(),
     })
   );
 }
 
 export async function adminSession(tokenOverride) {
-  return parseJson(
-    await fetch(adminApiUrl('/api/admin/session', tokenOverride), {
-      credentials: 'include',
-    })
-  );
+  const token = tokenOverride || getAdminToken();
+  return parseJson(await portalFetch('/api/admin/session', { token }));
 }
 
 export async function adminLogin(username, password) {
   const data = await parseJson(
-    await fetch(`${base}/api/admin/login`, {
+    await portalFetch('/api/admin/login', {
       method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
+      jsonBody: { username, password },
     })
   );
-  if (data.token) setAdminToken(data.token);
+  if (!data.token) {
+    throw new Error('Admin login did not return a token. Redeploy the API.');
+  }
+  setAdminToken(data.token);
   return data;
 }
 
@@ -134,28 +145,22 @@ export async function adminLogout() {
   setAdminToken('');
   if (!token) return { loggedOut: true };
   return parseJson(
-    await fetch(adminApiUrl('/api/admin/logout', token), {
-      method: 'POST',
-      credentials: 'include',
-    })
+    await portalFetch('/api/admin/logout', { method: 'POST', token })
   );
 }
 
 export async function adminStages() {
   return parseJson(
-    await fetch(adminApiUrl('/api/admin/stages'), {
-      credentials: 'include',
-    })
+    await portalFetch('/api/admin/stages', { token: getAdminToken() })
   );
 }
 
 export async function adminUpdateStatus(stageId, action) {
   return parseJson(
-    await fetch(adminApiUrl(`/api/admin/stages/${stageId}/status`), {
+    await portalFetch(`/api/admin/stages/${stageId}/status`, {
       method: 'PATCH',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action }),
+      token: getAdminToken(),
+      jsonBody: { action },
     })
   );
 }
@@ -171,4 +176,4 @@ export function downloadFile(stageId, filePath, content) {
   URL.revokeObjectURL(url);
 }
 
-export { getAdminToken, getWorkshopToken };
+export { getAdminToken, getWorkshopToken, setWorkshopToken, setAdminToken };

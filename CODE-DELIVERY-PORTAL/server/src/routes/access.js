@@ -1,9 +1,9 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
 const { sendSuccess, sendError } = require('../utils/errors');
-const { saveSession } = require('../utils/sessionSave');
 const { signWorkshopToken } = require('../utils/portalToken');
+const { verifyEnvPassword } = require('../utils/envPassword');
+const { respondAuth } = require('../utils/respondAuth');
 const {
   isStudentAccessConfigured,
   hasStudentAccess,
@@ -23,10 +23,7 @@ const loginLimiter = rateLimit({
 });
 
 function verifyStudentPassword(password) {
-  const plain = (process.env.STUDENT_ACCESS_PASSWORD || '').trim();
-  if (!plain || password == null) return false;
-  const submitted = String(password).trim();
-  return bcrypt.compareSync(submitted, bcrypt.hashSync(plain, 10));
+  return verifyEnvPassword('STUDENT_ACCESS_PASSWORD', password);
 }
 
 router.get('/session', (req, res) => {
@@ -56,12 +53,12 @@ router.post('/login', loginLimiter, (req, res) => {
   }
   req.session.studentAccess = true;
   const token = signWorkshopToken();
-  return saveSession(req, res, () => sendSuccess(res, { authenticated: true, token }));
+  return respondAuth(req, res, { authenticated: true, token });
 });
 
 router.post('/logout', (req, res) => {
   req.session.studentAccess = false;
-  return saveSession(req, res, () => sendSuccess(res, { authenticated: false }));
+  return respondAuth(req, res, { authenticated: false });
 });
 
 module.exports = router;

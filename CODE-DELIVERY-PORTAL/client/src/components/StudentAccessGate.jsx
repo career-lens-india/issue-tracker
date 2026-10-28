@@ -32,11 +32,7 @@ export default function StudentAccessGate({ children }) {
     e.preventDefault();
     setError('');
     try {
-      const data = await accessLogin(password);
-      if (!data.token) {
-        setError('Server did not return a workshop token. Redeploy the API.');
-        return;
-      }
+      await accessLogin(password);
       setAllowed(true);
       setPassword('');
     } catch (err) {

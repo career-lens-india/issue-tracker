@@ -82,16 +82,19 @@ function signWorkshopToken() {
 }
 
 function isAdminAuthenticated(req) {
-  if (req.session?.admin) return true;
   const token = extractRequestToken(req);
-  return verifyPortalToken(token, 'admin');
+  if (verifyPortalToken(token, 'admin')) return true;
+  if (req.session?.admin) return true;
+  return false;
 }
 
 function isWorkshopAuthenticated(req) {
-  if (req.session?.admin) return true;
-  if (req.session?.studentAccess) return true;
   const token = extractRequestToken(req);
-  return verifyPortalToken(token, 'workshop');
+  if (verifyPortalToken(token, 'workshop')) return true;
+  if (verifyPortalToken(token, 'admin')) return true;
+  if (req.session?.studentAccess) return true;
+  if (req.session?.admin) return true;
+  return false;
 }
 
 module.exports = {

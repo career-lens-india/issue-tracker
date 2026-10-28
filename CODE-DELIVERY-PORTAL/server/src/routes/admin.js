@@ -1,5 +1,4 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
 const { requireAdmin } = require('../middleware/auth');
 const { loadManifest } = require('../services/manifestService');
@@ -8,9 +7,10 @@ const {
   updateStageStatus,
 } = require('../services/releaseService');
 const { sendSuccess, sendError } = require('../utils/errors');
-const { saveSession } = require('../utils/sessionSave');
 const { getSessionCookieOptions } = require('../config/sessionCookie');
 const { signAdminToken, isAdminAuthenticated } = require('../utils/portalToken');
+const { verifyEnvPassword } = require('../utils/envPassword');
+const { respondAuth } = require('../utils/respondAuth');
 const { isDbReady } = require('../config/db');
 
 const router = express.Router();
@@ -24,10 +24,7 @@ const loginLimiter = rateLimit({
 });
 
 function verifyAdminPassword(password) {
-  const plain = (process.env.ADMIN_PASSWORD || '').trim();
-  if (!plain || password == null) return false;
-  const submitted = String(password).trim();
-  return bcrypt.compareSync(submitted, bcrypt.hashSync(plain, 10));
+  return verifyEnvPassword('ADMIN_PASSWORD', password);
 }
 
 function requireDb(req, res, next) {
@@ -52,9 +49,7 @@ router.post('/login', loginLimiter, requireDb, async (req, res) => {
   }
   req.session.admin = true;
   const token = signAdminToken();
-  return saveSession(req, res, () =>
-    sendSuccess(res, { username: expectedUser, token })
-  );
+  return respondAuth(req, res, { username: expectedUser, token });
 });
 
 router.post('/logout', (req, res) => {

@@ -38,7 +38,13 @@ function createApp({ mongoUrl, trustProxy = false } = {}) {
       return callback(new Error(`Origin not allowed by CORS: ${origin}`));
     },
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Admin-Token'],
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Portal-Token',
+      'X-Admin-Token',
+    ],
   };
 
   app.use(cors(corsOptions));

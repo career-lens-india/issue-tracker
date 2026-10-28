@@ -35,11 +35,16 @@ describe('portal API', () => {
       .send({ password: process.env.STUDENT_ACCESS_PASSWORD || 'workshop-session-pass' });
     expect(login.status).toBe(200);
     expect(login.body.data.token).toBeTruthy();
-    const res = await request(app).get(
-      `/api/stages?token=${encodeURIComponent(login.body.data.token)}`
+    const token = login.body.data.token;
+    const withQuery = await request(app).get(
+      `/api/stages?token=${encodeURIComponent(token)}`
     );
-    expect(res.status).toBe(200);
-    expect(res.body.data.stages).toHaveLength(1);
+    expect(withQuery.status).toBe(200);
+    const withBearer = await request(app)
+      .get('/api/stages')
+      .set('Authorization', `Bearer ${token}`);
+    expect(withBearer.status).toBe(200);
+    expect(withBearer.body.data.stages).toHaveLength(1);
   });
 
   test('student list hides unreleased stages', async () => {
@@ -131,9 +136,9 @@ describe('portal API', () => {
     expect(login.body.data.token).toBeTruthy();
     const session = await agent.get('/api/admin/session');
     expect(session.body.data.authenticated).toBe(true);
-    const tokenSession = await request(app).get(
-      `/api/admin/session?token=${encodeURIComponent(login.body.data.token)}`
-    );
+    const tokenSession = await request(app)
+      .get('/api/admin/session')
+      .set('Authorization', `Bearer ${login.body.data.token}`);
     expect(tokenSession.body.data.authenticated).toBe(true);
     const logout = await agent.post('/api/admin/logout');
     expect(logout.status).toBe(200);

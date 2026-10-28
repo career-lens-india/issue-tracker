@@ -57,10 +57,6 @@ export default function AdminPage() {
     try {
       const loginData = await adminLogin(username, password);
       setPassword('');
-      if (!loginData.token) {
-        setLoginError('Server did not return an admin token. Redeploy the API.');
-        return;
-      }
       setSession({ authenticated: true, username: loginData.username });
       await loadStages();
     } catch (err) {
