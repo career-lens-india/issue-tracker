@@ -40,14 +40,23 @@ function parseBearer(req) {
   return match ? match[1].trim() : null;
 }
 
+function extractAdminToken(req) {
+  const bearer = parseBearer(req);
+  if (bearer) return bearer;
+  const custom = req.headers['x-admin-token'];
+  if (typeof custom === 'string' && custom.trim()) return custom.trim();
+  return null;
+}
+
 function isAdminAuthenticated(req) {
   if (req.session && req.session.admin) return true;
-  return verifyAdminToken(parseBearer(req));
+  return verifyAdminToken(extractAdminToken(req));
 }
 
 module.exports = {
   signAdminToken,
   verifyAdminToken,
   parseBearer,
+  extractAdminToken,
   isAdminAuthenticated,
 };

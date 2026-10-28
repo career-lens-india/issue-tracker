@@ -49,15 +49,16 @@ export default function AdminPage() {
     e.preventDefault();
     setLoginError('');
     try {
-      await adminLogin(username, password);
+      const loginData = await adminLogin(username, password);
       setPassword('');
-      const data = await adminSession();
-      if (!data.authenticated) {
-        setLoginError('Sign-in failed to establish an admin session. Redeploy API and frontend, then try again.');
-        setSession({ authenticated: false });
-        return;
+      if (loginData.token) {
+        const data = await adminSession(loginData.token);
+        if (data.authenticated) {
+          setSession(data);
+          return;
+        }
       }
-      setSession(data);
+      setSession({ authenticated: true, username: loginData.username });
     } catch (err) {
       setLoginError(err.message || 'Login failed');
     }

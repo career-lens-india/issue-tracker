@@ -1,4 +1,4 @@
-const base = import.meta.env.VITE_API_URL || '';
+const base = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
 const ADMIN_TOKEN_KEY = 'portal.adminToken';
 
 function getAdminToken() {
@@ -18,10 +18,13 @@ function setAdminToken(token) {
   }
 }
 
-function adminHeaders(extra = {}) {
+function adminHeaders(extra = {}, tokenOverride) {
   const headers = { ...extra };
-  const token = getAdminToken();
-  if (token) headers.Authorization = `Bearer ${token}`;
+  const token = tokenOverride || getAdminToken();
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+    headers['X-Admin-Token'] = token;
+  }
   return headers;
 }
 
@@ -66,11 +69,11 @@ export async function fetchStageFile(stageId, filePath) {
   );
 }
 
-export async function adminSession() {
+export async function adminSession(tokenOverride) {
   return parseJson(
     await fetch(`${base}/api/admin/session`, {
       credentials: 'include',
-      headers: adminHeaders(),
+      headers: adminHeaders({}, tokenOverride),
     })
   );
 }
