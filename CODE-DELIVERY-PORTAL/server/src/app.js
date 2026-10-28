@@ -1,10 +1,15 @@
-
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+const mongoose = require('mongoose');
 const path = require('path');
 const { getSessionSecret } = require('./config/env');
+const {
+  getSessionCookieOptions,
+  isOriginAllowed,
+  parseAllowedOrigins,
+} = require('./config/sessionCookie');
 const { AppError, sendError } = require('./utils/errors');
 
 const healthRouter = require('./routes/health');
@@ -12,74 +17,46 @@ const stagesRouter = require('./routes/stages');
 const adminRouter = require('./routes/admin');
 const accessRouter = require('./routes/access');
 
-function getSessionCookieOptions(clientOrigin) {
-  const isProd = process.env.NODE_ENV === 'production';
-  const serveTogether = process.env.SERVE_CLIENT === 'true';
-  const localDev =
-    !clientOrigin ||
-    clientOrigin.includes('localhost') ||
-    clientOrigin.includes('127.0.0.1');
-  // Frontend and API on different Vercel projects → cross-origin credentialed fetch
-  const separateDeploy =
-    isProd && !serveTogether && !localDev && Boolean(process.env.VERCEL);
-
-  return {
-    httpOnly: true,
-    sameSite: separateDeploy ? 'none' : 'lax',
-    secure: isProd,
-    maxAge: 8 * 60 * 60 * 1000,
-  };
-}
-
 function createApp({ mongoUrl, trustProxy = false } = {}) {
   const app = express();
-
   if (trustProxy) app.set('trust proxy', 1);
-  const clientOrigin =
-  process.env.CLIENT_ORIGIN || 'http://localhost:5173';
 
-  // CHANGED: Allow the configured origin and known frontend deployments.
-  const allowedOrigins = [
-    process.env.CLIENT_ORIGIN,
-    'https://code-delivery-platform.vercel.app',
-    'https://code-delivery-platform-h9uu3zl1p-elva-prabhu.vercel.app',
-    'https://code-delivery-platform-ao9ppnwtx-elva-prabhu.vercel.app',
-  ].filter(Boolean);
+  const clientOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+  const allowedOrigins = parseAllowedOrigins();
+
+  if (process.env.NODE_ENV === 'production' && allowedOrigins.size === 0) {
+    throw new Error('CLIENT_ORIGIN (or ALLOWED_ORIGINS) is required in production');
+  }
 
   const corsOptions = {
-    origin: (origin, callback) => {
-      // Allow requests without an Origin header (e.g. server-to-server).
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
+    origin(origin, callback) {
+      if (isOriginAllowed(origin)) {
+        return callback(null, origin || true);
       }
-
-      // CHANGED: Reject unknown origins.
-      return callback(new Error('Origin not allowed by CORS'));
+      return callback(new Error(`Origin not allowed by CORS: ${origin}`));
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], // NEW
-    allowedHeaders: ['Content-Type', 'Authorization'], // NEW
-    optionsSuccessStatus: 204, // NEW
   };
 
-  // CHANGED: Apply CORS before routes and session middleware.
   app.use(cors(corsOptions));
-
-  // NEW: Explicitly respond to preflight requests.
   app.options(/.*/, cors(corsOptions));
-
   app.use(express.json({ limit: '1mb' }));
 
+  const cookieOptions = getSessionCookieOptions(clientOrigin);
   const sessionOptions = {
     name: 'portal.sid',
     secret: getSessionSecret(),
     resave: false,
     saveUninitialized: false,
-    cookie: getSessionCookieOptions(clientOrigin),
+    cookie: cookieOptions,
   };
 
   if (mongoUrl) {
-    sessionOptions.store = MongoStore.create({ mongoUrl });
+    const storeOptions =
+      mongoose.connection.readyState === 1
+        ? { client: mongoose.connection.getClient() }
+        : { mongoUrl };
+    sessionOptions.store = MongoStore.create(storeOptions);
   }
 
   app.use(session(sessionOptions));
@@ -90,10 +67,8 @@ function createApp({ mongoUrl, trustProxy = false } = {}) {
   app.use('/api/admin', adminRouter);
 
   const clientDist = path.join(__dirname, '../../client/dist');
-
   if (process.env.SERVE_CLIENT === 'true') {
     app.use(express.static(clientDist));
-
     app.get('*', (req, res, next) => {
       if (req.path.startsWith('/api')) return next();
       return res.sendFile(path.join(clientDist, 'index.html'));
@@ -104,11 +79,10 @@ function createApp({ mongoUrl, trustProxy = false } = {}) {
     if (err instanceof AppError) {
       return sendError(res, err.statusCode, err.code, err.message);
     }
-
     if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
       console.error(err);
     }
-
     return sendError(res, 500, 'INTERNAL_ERROR', 'An unexpected error occurred');
   });
 

@@ -51,9 +51,22 @@ async function connectDatabase(uri) {
   if (!uri) {
     throw new Error('MongoDB connection URI is required');
   }
-  if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(uri);
+
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
   }
+
+  if (process.env.VERCEL && global.__portalMongoosePromise) {
+    await global.__portalMongoosePromise;
+    return mongoose.connection;
+  }
+
+  const connectPromise = mongoose.connect(uri);
+  if (process.env.VERCEL) {
+    global.__portalMongoosePromise = connectPromise;
+  }
+  await connectPromise;
+  return mongoose.connection;
 }
 
 async function initializeDatabase() {
@@ -84,7 +97,7 @@ async function initializeDatabase() {
     if (!uri) {
       throw new Error(`MONGODB_URI is required when APP_MODE=${appMode}`);
     }
-    if (mongoose.connection.readyState !== 0) {
+    if (mongoose.connection.readyState !== 0 && !process.env.VERCEL) {
       await mongoose.disconnect();
     }
     await stopMemoryServer();

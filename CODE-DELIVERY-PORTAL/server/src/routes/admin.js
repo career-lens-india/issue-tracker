@@ -9,6 +9,7 @@ const {
 } = require('../services/releaseService');
 const { sendSuccess, sendError } = require('../utils/errors');
 const { saveSession } = require('../utils/sessionSave');
+const { getSessionCookieOptions } = require('../config/sessionCookie');
 const { isDbReady } = require('../config/db');
 
 const router = express.Router();
@@ -53,11 +54,12 @@ router.post('/login', loginLimiter, requireDb, async (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
+  const cookieOpts = getSessionCookieOptions(process.env.CLIENT_ORIGIN || '');
   req.session.destroy((err) => {
     if (err) {
       return sendError(res, 500, 'LOGOUT_FAILED', 'Could not log out');
     }
-    res.clearCookie('portal.sid');
+    res.clearCookie('portal.sid', cookieOpts);
     return sendSuccess(res, { loggedOut: true });
   });
 });
