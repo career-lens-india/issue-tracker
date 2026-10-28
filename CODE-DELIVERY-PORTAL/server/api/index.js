@@ -36,7 +36,11 @@ module.exports = async (req, res) => {
     const app = await getApp();
     return app(req, res);
   } catch (error) {
-    console.error('API initialization failed:', error);
+    console.error('API initialization failed:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    });
 
     return res.status(500).json({
       error: 'API_INITIALIZATION_FAILED',
