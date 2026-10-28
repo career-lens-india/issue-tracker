@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { accessLogin, accessSession, getWorkshopToken } from '../api';
+import { accessLogin, fetchStages, getWorkshopToken, setWorkshopToken } from '../api';
 
 export default function StudentAccessGate({ children }) {
   const [checking, setChecking] = useState(true);
@@ -9,20 +9,26 @@ export default function StudentAccessGate({ children }) {
 
   useEffect(() => {
     let cancelled = false;
-    async function check() {
+    async function boot() {
+      const stored = getWorkshopToken();
+      if (!stored) {
+        if (!cancelled) setAllowed(false);
+        if (!cancelled) setChecking(false);
+        return;
+      }
       try {
-        const stored = getWorkshopToken();
-        const data = await accessSession(stored || undefined);
-        if (!cancelled) {
-          setAllowed(!data.required || data.authenticated);
-        }
+        await fetchStages();
+        if (!cancelled) setAllowed(true);
       } catch {
-        if (!cancelled) setError('Could not verify workshop access.');
+        if (!cancelled) {
+          setWorkshopToken('');
+          setAllowed(false);
+        }
       } finally {
         if (!cancelled) setChecking(false);
       }
     }
-    check();
+    boot();
     return () => {
       cancelled = true;
     };
@@ -33,6 +39,7 @@ export default function StudentAccessGate({ children }) {
     setError('');
     try {
       await accessLogin(password);
+      await fetchStages();
       setAllowed(true);
       setPassword('');
     } catch (err) {

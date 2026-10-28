@@ -35,6 +35,15 @@ router.get('/session', (req, res) => {
   });
 });
 
+router.post('/session', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  const required = isStudentAccessConfigured();
+  return sendSuccess(res, {
+    required,
+    authenticated: required ? hasStudentAccess(req) : true,
+  });
+});
+
 router.post('/login', loginLimiter, (req, res) => {
   if (!isStudentAccessConfigured()) {
     return sendError(

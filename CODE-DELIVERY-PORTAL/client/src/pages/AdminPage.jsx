@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import {
   adminLogin,
   adminLogout,
-  adminSession,
   adminStages,
   adminUpdateStatus,
   getAdminToken,
+  setAdminToken,
 } from '../api';
 import { statusLabel } from '../statusLabels';
 
@@ -24,32 +24,35 @@ export default function AdminPage() {
   const [message, setMessage] = useState('');
   const [pending, setPending] = useState(null);
 
-  async function refreshSession() {
-    const token = getAdminToken();
-    if (!token) {
-      setSession({ authenticated: false });
-      return;
+  useEffect(() => {
+    let cancelled = false;
+    async function boot() {
+      const token = getAdminToken();
+      if (!token) {
+        if (!cancelled) setSession({ authenticated: false });
+        return;
+      }
+      try {
+        const data = await adminStages();
+        if (cancelled) return;
+        setStages(data.stages);
+        setSession({ authenticated: true, username: loginData.username || 'admin' });
+      } catch {
+        if (cancelled) return;
+        setAdminToken('');
+        setSession({ authenticated: false });
+      }
     }
-    try {
-      const data = await adminSession(token);
-      setSession(data);
-    } catch {
-      setSession({ authenticated: false });
-    }
-  }
+    boot();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function loadStages() {
     const data = await adminStages();
     setStages(data.stages);
   }
-
-  useEffect(() => {
-    refreshSession();
-  }, []);
-
-  useEffect(() => {
-    if (session?.authenticated) loadStages();
-  }, [session]);
 
   async function handleLogin(e) {
     e.preventDefault();
@@ -67,7 +70,7 @@ export default function AdminPage() {
   async function handleLogout() {
     await adminLogout();
     setStages([]);
-    await refreshSession();
+    setSession({ authenticated: false });
   }
 
   function confirmAction(stage, action) {

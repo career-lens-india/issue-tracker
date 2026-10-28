@@ -80,7 +80,13 @@ async function parseJson(res) {
 
 export async function accessSession(tokenOverride) {
   const token = tokenOverride || getWorkshopToken();
-  return parseJson(await portalFetch('/api/access/session', { token }));
+  return parseJson(
+    await portalFetch('/api/access/session', {
+      method: 'POST',
+      token,
+      jsonBody: token ? { token } : {},
+    })
+  );
 }
 
 export async function accessLogin(password) {
@@ -123,7 +129,13 @@ export async function fetchStageFile(stageId, filePath) {
 
 export async function adminSession(tokenOverride) {
   const token = tokenOverride || getAdminToken();
-  return parseJson(await portalFetch('/api/admin/session', { token }));
+  return parseJson(
+    await portalFetch('/api/admin/session', {
+      method: 'POST',
+      token,
+      jsonBody: token ? { token } : {},
+    })
+  );
 }
 
 export async function adminLogin(username, password) {
