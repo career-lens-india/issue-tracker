@@ -1,7 +1,8 @@
 const { sendError } = require('../utils/errors');
+const { isAdminAuthenticated } = require('../utils/adminToken');
 
 function requireAdmin(req, res, next) {
-  if (req.session && req.session.admin === true) {
+  if (isAdminAuthenticated(req)) {
     return next();
   }
   return sendError(res, 401, 'UNAUTHORIZED', 'Admin authentication required');

@@ -10,6 +10,7 @@ const {
 const { sendSuccess, sendError } = require('../utils/errors');
 const { saveSession } = require('../utils/sessionSave');
 const { getSessionCookieOptions } = require('../config/sessionCookie');
+const { signAdminToken, isAdminAuthenticated } = require('../utils/adminToken');
 const { isDbReady } = require('../config/db');
 
 const router = express.Router();
@@ -50,7 +51,10 @@ router.post('/login', loginLimiter, requireDb, async (req, res) => {
     return sendError(res, 401, 'INVALID_CREDENTIALS', 'Invalid credentials');
   }
   req.session.admin = true;
-  return saveSession(req, res, () => sendSuccess(res, { username: expectedUser }));
+  const token = signAdminToken();
+  return saveSession(req, res, () =>
+    sendSuccess(res, { username: expectedUser, token })
+  );
 });
 
 router.post('/logout', (req, res) => {
@@ -65,8 +69,11 @@ router.post('/logout', (req, res) => {
 });
 
 router.get('/session', (req, res) => {
-  if (req.session && req.session.admin) {
-    return sendSuccess(res, { authenticated: true, username: process.env.ADMIN_USERNAME || 'admin' });
+  if (isAdminAuthenticated(req)) {
+    return sendSuccess(res, {
+      authenticated: true,
+      username: process.env.ADMIN_USERNAME || 'admin',
+    });
   }
   return sendSuccess(res, { authenticated: false });
 });

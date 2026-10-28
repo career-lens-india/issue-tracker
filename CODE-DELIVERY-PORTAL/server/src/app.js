@@ -19,7 +19,9 @@ const accessRouter = require('./routes/access');
 
 function createApp({ mongoUrl, trustProxy = false } = {}) {
   const app = express();
-  if (trustProxy) app.set('trust proxy', 1);
+  if (trustProxy || process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+  }
 
   const clientOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
   const allowedOrigins = parseAllowedOrigins();
@@ -36,6 +38,7 @@ function createApp({ mongoUrl, trustProxy = false } = {}) {
       return callback(new Error(`Origin not allowed by CORS: ${origin}`));
     },
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
   };
 
   app.use(cors(corsOptions));
@@ -48,6 +51,7 @@ function createApp({ mongoUrl, trustProxy = false } = {}) {
     secret: getSessionSecret(),
     resave: false,
     saveUninitialized: false,
+    proxy: process.env.NODE_ENV === 'production',
     cookie: cookieOptions,
   };
 

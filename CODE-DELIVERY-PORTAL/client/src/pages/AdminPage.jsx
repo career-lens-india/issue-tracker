@@ -53,10 +53,7 @@ export default function AdminPage() {
       setPassword('');
       const data = await adminSession();
       if (!data.authenticated) {
-        setLoginError(
-          'Sign-in succeeded on the server, but this browser did not keep the session cookie. ' +
-            'Set API CLIENT_ORIGIN to this site’s exact URL (no trailing slash), add preview URLs to ALLOWED_ORIGINS if needed, redeploy the API, and avoid blocking third-party cookies.'
-        );
+        setLoginError('Sign-in failed to establish an admin session. Redeploy API and frontend, then try again.');
         setSession({ authenticated: false });
         return;
       }

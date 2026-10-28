@@ -1,4 +1,29 @@
 const base = import.meta.env.VITE_API_URL || '';
+const ADMIN_TOKEN_KEY = 'portal.adminToken';
+
+function getAdminToken() {
+  try {
+    return sessionStorage.getItem(ADMIN_TOKEN_KEY) || '';
+  } catch {
+    return '';
+  }
+}
+
+function setAdminToken(token) {
+  try {
+    if (token) sessionStorage.setItem(ADMIN_TOKEN_KEY, token);
+    else sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+function adminHeaders(extra = {}) {
+  const headers = { ...extra };
+  const token = getAdminToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+}
 
 async function parseJson(res) {
   const body = await res.json();
@@ -42,11 +67,16 @@ export async function fetchStageFile(stageId, filePath) {
 }
 
 export async function adminSession() {
-  return parseJson(await fetch(`${base}/api/admin/session`, { credentials: 'include' }));
+  return parseJson(
+    await fetch(`${base}/api/admin/session`, {
+      credentials: 'include',
+      headers: adminHeaders(),
+    })
+  );
 }
 
 export async function adminLogin(username, password) {
-  return parseJson(
+  const data = await parseJson(
     await fetch(`${base}/api/admin/login`, {
       method: 'POST',
       credentials: 'include',
@@ -54,16 +84,28 @@ export async function adminLogin(username, password) {
       body: JSON.stringify({ username, password }),
     })
   );
+  if (data.token) setAdminToken(data.token);
+  return data;
 }
 
 export async function adminLogout() {
+  setAdminToken('');
   return parseJson(
-    await fetch(`${base}/api/admin/logout`, { method: 'POST', credentials: 'include' })
+    await fetch(`${base}/api/admin/logout`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: adminHeaders(),
+    })
   );
 }
 
 export async function adminStages() {
-  return parseJson(await fetch(`${base}/api/admin/stages`, { credentials: 'include' }));
+  return parseJson(
+    await fetch(`${base}/api/admin/stages`, {
+      credentials: 'include',
+      headers: adminHeaders(),
+    })
+  );
 }
 
 export async function adminUpdateStatus(stageId, action) {
@@ -71,7 +113,7 @@ export async function adminUpdateStatus(stageId, action) {
     await fetch(`${base}/api/admin/stages/${stageId}/status`, {
       method: 'PATCH',
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
+      headers: adminHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ action }),
     })
   );
