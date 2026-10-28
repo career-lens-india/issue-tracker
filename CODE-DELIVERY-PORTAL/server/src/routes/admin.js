@@ -69,6 +69,7 @@ router.post('/logout', (req, res) => {
 });
 
 router.get('/session', (req, res) => {
+  res.set('Cache-Control', 'no-store');
   if (isAdminAuthenticated(req)) {
     return sendSuccess(res, {
       authenticated: true,

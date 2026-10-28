@@ -45,6 +45,8 @@ function extractAdminToken(req) {
   if (bearer) return bearer;
   const custom = req.headers['x-admin-token'];
   if (typeof custom === 'string' && custom.trim()) return custom.trim();
+  const q = req.query?.token || req.query?.adminToken;
+  if (q != null && String(q).trim()) return String(q).trim();
   return null;
 }
 

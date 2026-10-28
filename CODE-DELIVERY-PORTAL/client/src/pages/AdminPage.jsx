@@ -5,6 +5,7 @@ import {
   adminSession,
   adminStages,
   adminUpdateStatus,
+  getAdminToken,
 } from '../api';
 import { statusLabel } from '../statusLabels';
 
@@ -24,8 +25,13 @@ export default function AdminPage() {
   const [pending, setPending] = useState(null);
 
   async function refreshSession() {
+    const token = getAdminToken();
+    if (!token) {
+      setSession({ authenticated: false });
+      return;
+    }
     try {
-      const data = await adminSession();
+      const data = await adminSession(token);
       setSession(data);
     } catch {
       setSession({ authenticated: false });
@@ -51,14 +57,12 @@ export default function AdminPage() {
     try {
       const loginData = await adminLogin(username, password);
       setPassword('');
-      if (loginData.token) {
-        const data = await adminSession(loginData.token);
-        if (data.authenticated) {
-          setSession(data);
-          return;
-        }
+      if (!loginData.token) {
+        setLoginError('Server did not return an admin token. Redeploy the API.');
+        return;
       }
       setSession({ authenticated: true, username: loginData.username });
+      await loadStages();
     } catch (err) {
       setLoginError(err.message || 'Login failed');
     }

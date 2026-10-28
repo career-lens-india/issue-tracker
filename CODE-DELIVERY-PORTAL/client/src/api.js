@@ -18,19 +18,22 @@ function setAdminToken(token) {
   }
 }
 
-function adminHeaders(extra = {}, tokenOverride) {
-  const headers = { ...extra };
+/** Append signed admin token as query param (reliable on cross-origin Vercel). */
+function adminApiUrl(path, tokenOverride) {
   const token = tokenOverride || getAdminToken();
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-    headers['X-Admin-Token'] = token;
-  }
-  return headers;
+  const pathNorm = path.startsWith('/') ? path : `/${path}`;
+  if (!token) return `${base}${pathNorm}`;
+  const sep = pathNorm.includes('?') ? '&' : '?';
+  return `${base}${pathNorm}${sep}token=${encodeURIComponent(token)}`;
+}
+
+function adminHeaders(extra = {}) {
+  return { ...extra };
 }
 
 async function parseJson(res) {
   const body = await res.json();
-  if (!res.ok) {
+  if (!body.success) {
     const message = body?.error?.message || 'Request failed';
     const err = new Error(message);
     err.code = body?.error?.code;
@@ -71,9 +74,8 @@ export async function fetchStageFile(stageId, filePath) {
 
 export async function adminSession(tokenOverride) {
   return parseJson(
-    await fetch(`${base}/api/admin/session`, {
+    await fetch(adminApiUrl('/api/admin/session', tokenOverride), {
       credentials: 'include',
-      headers: adminHeaders({}, tokenOverride),
     })
   );
 }
@@ -92,31 +94,31 @@ export async function adminLogin(username, password) {
 }
 
 export async function adminLogout() {
+  const token = getAdminToken();
   setAdminToken('');
+  if (!token) return { loggedOut: true };
   return parseJson(
-    await fetch(`${base}/api/admin/logout`, {
+    await fetch(adminApiUrl('/api/admin/logout', token), {
       method: 'POST',
       credentials: 'include',
-      headers: adminHeaders(),
     })
   );
 }
 
 export async function adminStages() {
   return parseJson(
-    await fetch(`${base}/api/admin/stages`, {
+    await fetch(adminApiUrl('/api/admin/stages'), {
       credentials: 'include',
-      headers: adminHeaders(),
     })
   );
 }
 
 export async function adminUpdateStatus(stageId, action) {
   return parseJson(
-    await fetch(`${base}/api/admin/stages/${stageId}/status`, {
+    await fetch(adminApiUrl(`/api/admin/stages/${stageId}/status`), {
       method: 'PATCH',
       credentials: 'include',
-      headers: adminHeaders({ 'Content-Type': 'application/json' }),
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action }),
     })
   );
@@ -132,3 +134,5 @@ export function downloadFile(stageId, filePath, content) {
   a.click();
   URL.revokeObjectURL(url);
 }
+
+export { getAdminToken };

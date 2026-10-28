@@ -114,8 +114,13 @@ describe('portal API', () => {
     const agent = request.agent(app);
     const login = await loginAdmin(agent);
     expect(login.status).toBe(200);
+    expect(login.body.data.token).toBeTruthy();
     const session = await agent.get('/api/admin/session');
     expect(session.body.data.authenticated).toBe(true);
+    const tokenSession = await request(app).get(
+      `/api/admin/session?token=${encodeURIComponent(login.body.data.token)}`
+    );
+    expect(tokenSession.body.data.authenticated).toBe(true);
     const logout = await agent.post('/api/admin/logout');
     expect(logout.status).toBe(200);
     const after = await agent.get('/api/admin/session');

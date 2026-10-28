@@ -97,7 +97,7 @@ function validateProductionConfig() {
 }
 
 function getSessionSecret() {
-  const secret = process.env.SESSION_SECRET;
+  const secret = (process.env.SESSION_SECRET || '').trim();
   if (secret && secret.length >= 16) return secret;
   if (process.env.NODE_ENV === 'production') {
     throw new Error('SESSION_SECRET is required in production');
