@@ -53,11 +53,45 @@ export default function HomePage() {
       {loading && <p className="center-msg">Loading…</p>}
       {error && <p className="error-banner">{error}</p>}
       {!loading && !error && !hasReleasedContent && (
-        <div className="coming-soon-panel empty-portal">
-          <h2>Content not available yet</h2>
+        <div className="coming-soon-panel empty-portal setup-guide">
+          <h2>Set up your machine while you wait</h2>
+          <p className="muted">
+            Stage modules appear here when your instructor publishes them. If nothing is live yet,
+            install the tools below from scratch so you are ready for Stage 1.
+          </p>
+
+          <h3>1. Install Node.js and npm</h3>
+          <ol>
+            <li>
+              Download the <strong>LTS</strong> installer from{' '}
+              <a href="https://nodejs.org/" target="_blank" rel="noreferrer">
+                nodejs.org
+              </a>{' '}
+              (includes npm).
+            </li>
+            <li>Close and reopen your terminal after installing.</li>
+            <li>Confirm both are available:</li>
+          </ol>
+          <pre className="setup-cmd">{`node -v
+npm -v`}</pre>
+          <p className="muted">You should see version numbers (for example Node 20.x and npm 10.x).</p>
+
+          <h3>2. Create a new React app with Vite</h3>
+          <p>Pick a folder where you keep projects, then run:</p>
+          <pre className="setup-cmd">{`npm create vite@latest sprintboard-app -- --template react
+cd sprintboard-app
+npm install
+npm run dev`}</pre>
           <p>
-            Workshop materials will show up here when your instructor publishes the first stage.
-            Please check back during the session — you do not need to do anything until content appears.
+            Open the URL Vite prints (usually <code>http://localhost:5173</code>). You should see the
+            default Vite + React page. This <code>sprintboard-app</code> folder is where you will
+            apply each stage&apos;s starter code during the workshop.
+          </p>
+
+          <h3>3. When content goes live</h3>
+          <p>
+            Refresh this page. Open <strong>Stage 1</strong>, read the instructions, and copy starter
+            files into your <code>sprintboard-app</code> project as directed.
           </p>
         </div>
       )}
